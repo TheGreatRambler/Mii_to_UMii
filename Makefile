@@ -23,7 +23,7 @@ endif
 CFLAGS := -std=c11
 
 # C++ flags
-CXXFLAGS := -std=gnu++17 $(shell pkg-config --cflags libzstd) -I./include
+CXXFLAGS := -std=gnu++17 $(shell pkg-config --cflags fmt) -I./include
 
 # C/C++ flags
 CPPFLAGS := -Wall -Wno-maybe-uninitialized -Wno-sign-compare -Wno-switch-enum -Wno-switch -Wno-deprecated-declarations -DKS_STR_ENCODING_NONE
@@ -36,7 +36,7 @@ else
 	CPPFLAGS += -Og -g -ggdb -DDEBUG
 endif
 
-LDFLAGS := $(shell pkg-config --libs libzstd) -lpthread
+LDFLAGS := $(shell pkg-config --libs fmt) -lpthread
 ifeq ($(UNAME),Msys)
 	# Needed for sockets on windows
 	LDFLAGS += -lws2_32
