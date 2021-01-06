@@ -1,7 +1,9 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <filesystem>
 #include <fmt/core.h>
+#include <fmt/format.h>
 #include <fstream>
 #include <string>
 
@@ -9,6 +11,8 @@
 
 #include "ksy_gen/kaitai/kaitaistream.h"
 
+// All generated from the KSY files here:
+// https://github.com/RiiConnect24/mii2studio
 #include "ksy_gen/gen1_wii.h"
 #include "ksy_gen/gen2_wiiu_3ds_miitomo.h"
 #include "ksy_gen/gen3_studio.h"
@@ -24,13 +28,15 @@ int main (int argc, char* argv[]) {
 	// clang-format off
 	commandLineOptions.add_options()
 		("i,input", "Input file", cxxopts::value<std::string>())
-		("o,output", "Output file", cxxopts::value<std::string>()->default_value(NULL))
+		("o,output", "Output file", cxxopts::value<std::string>()->default_value(""))
 		("t,type", "Input Mii type (wii/3ds/wiiu/miitomo/switch/switchgame/studio)", cxxopts::value<std::string>()->default_value("wii"))
 		("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
 		("h,help", "Print usage");
 	// clang-format on
 
 	auto commandLineResult = commandLineOptions.parse (argc, argv);
+
+	bool isVerbose = commandLineResult["verbose"].as<bool> ();
 
 	if (commandLineResult.count ("help")) {
 		puts (commandLineOptions.help ().c_str ());
@@ -44,7 +50,17 @@ int main (int argc, char* argv[]) {
 		outputFile = commandLineResult["output"].as<std::string> ();
 	} else {
 		// Using the YML format, because string formats are easier to deal with
-		outputFile = HELPERS::splitString (inputFile, '.')[0] + ".umii.yml";
+		outputFile = std::filesystem::path (inputFile).stem ().string () + ".umii.yml";
+	}
+
+	if (isVerbose) {
+		// clang-format off
+		puts (fmt::format (
+			"| Input type: {}\n"
+			"| Input file: {}\n"
+			"| Output file: {}\n",
+		inputType, inputFile, outputFile).c_str ());
+		// clang-format on
 	}
 
 	std::ifstream is (inputFile, std::ifstream::binary);
@@ -278,7 +294,7 @@ int main (int argc, char* argv[]) {
 		"      lip_color: {}\n"
 		"    rito: !obj {{body_color: {}, hair_color: {}}}\n"
 		"    zora: !obj {{body_color: {}}}\n"
-		"  lists: {}\n",
+		"  lists: {{}}\n",
 
 		// Ffsd
 		info.ffsd_no_use_ffsd,
@@ -388,7 +404,16 @@ int main (int argc, char* argv[]) {
 	);
 	// clang-format on
 
-	std::ofstream outfile (outputFile);
+	if (isVerbose) {
+		puts (fmt::format ("| UMii output: \n{}\n\n", generatedUMii).c_str ());
+	}
+
+	std::ofstream outfile (outputFile, std::ofstream::binary);
+
+	if (!outfile.is_open ()) {
+		puts (fmt::format ("Output file {} did not open\n", outputFile).c_str ());
+	}
+
 	outfile.write (generatedUMii.c_str (), generatedUMii.size ());
 	outfile.close ();
 

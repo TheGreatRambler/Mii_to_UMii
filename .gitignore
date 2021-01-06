@@ -1,1 +1,6 @@
 bin
+release
+*.zip
+*.exe
+*.dll
+compile_commands.json
