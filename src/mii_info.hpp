@@ -30,7 +30,7 @@ namespace Mii {
 		std::string personal_voice_type  = "Hylia_Man_Old_Normal02";
 		// Common
 		int common_backpack       = -1;
-		int common_hat            = 0;
+		int common_hat            = -1;
 		bool common_no_hat_always = true;
 		int common_body_correct   = 0;
 		bool common_is_mid_age    = false;
@@ -156,5 +156,19 @@ namespace Mii {
 		{ 8, 8 },
 		{ 10, 9 },
 		{ 11, 1 },
+	};
+
+	static const std::unordered_map<int, int> SkinTone {
+		{ 0, 0 },  //	Yellow, Light
+		{ 1, 1 },  //	Yellow, Dark
+		{ 7, 2 },  //	Yellow, Fair
+		{ 3, 3 },  //	Pink, Fair
+		{ 8, 4 },  //	Black, Fair
+		{ 5, 5 },  //	Black, Dark
+		{ 6, 6 },  //	Pink, Light
+		{ 7, 7 },  //	White, Fair
+		{ 0, 8 },  //	White, Light
+		{ 4, 9 },  //	Brown, Fair
+		{ 2, 10 }, //	Brown, Light
 	};
 };

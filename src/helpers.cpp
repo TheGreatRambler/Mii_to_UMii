@@ -40,3 +40,32 @@ std::string HELPERS::exec (const char* cmd) {
 	}
 	return result;
 }
+
+std::string HELPERS::bytesToHexString (unsigned char* info, unsigned int infoLength) {
+	char* buffer;
+	const char* pszNibbleToHex = { "0123456789ABCDEF" };
+	int nNibble, i;
+	if (infoLength > 0) {
+		if (info != NULL) {
+			buffer                   = (char*)malloc ((infoLength * 2) + 1);
+			buffer[(infoLength * 2)] = 0;
+			for (i = 0; i < infoLength; i++) {
+				nNibble           = info[i] >> 4;
+				buffer[2 * i]     = pszNibbleToHex[nNibble];
+				nNibble           = info[i] & 0x0F;
+				buffer[2 * i + 1] = pszNibbleToHex[nNibble];
+			}
+
+		} else {
+			*buffer = NULL;
+		}
+	} else {
+		*buffer = NULL;
+	}
+
+	if (buffer != NULL) {
+		return std::string (buffer);
+	} else {
+		return "";
+	}
+}

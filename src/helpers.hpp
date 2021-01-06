@@ -17,6 +17,7 @@
 namespace HELPERS {
 	std::vector<std::string> splitString (const std::string s, char delim);
 	std::string joinString (std::vector<std::string> strings, std::string delimiter);
+	std::string bytesToHexString (unsigned char* info, unsigned int infoLength);
 
 	std::string exec (const char* cmd);
 }
