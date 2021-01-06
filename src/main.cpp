@@ -22,24 +22,34 @@
 #include "helpers.hpp"
 #include "mii_info.hpp"
 
+static const std::string programVersion = "0.0.1";
+
 int main (int argc, char* argv[]) {
 	cxxopts::Options commandLineOptions ("Mii_to_UMii", "Convert Mii files to UMii files for use with BoTW");
 
 	// clang-format off
 	commandLineOptions.add_options()
 		("i,input", "Input file", cxxopts::value<std::string>())
-		("o,output", "Output file", cxxopts::value<std::string>()->default_value(""))
+		("o,output", "Output file", cxxopts::value<std::string>())
 		("t,type", "Input Mii type (wii/3ds/wiiu/miitomo/switch/switchgame/studio)", cxxopts::value<std::string>()->default_value("wii"))
-		("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
+		("x,verbose", "Verbose output")
+		("b,binary", "Output binary file")
+		("v,version", "Print verson")
 		("h,help", "Print usage");
 	// clang-format on
 
 	auto commandLineResult = commandLineOptions.parse (argc, argv);
 
-	bool isVerbose = commandLineResult["verbose"].as<bool> ();
+	bool isVerbose      = commandLineResult["verbose"].as<bool> ();
+	bool outputAsBinary = commandLineResult["binary"].as<bool> ();
 
 	if (commandLineResult.count ("help")) {
 		puts (commandLineOptions.help ().c_str ());
+		return 0;
+	}
+
+	if (commandLineResult.count ("version")) {
+		puts (fmt::format ("miitoumii v{} copyright TheGreatRambler", programVersion).c_str ());
 		return 0;
 	}
 
@@ -49,8 +59,7 @@ int main (int argc, char* argv[]) {
 	if (commandLineResult.count ("output")) {
 		outputFile = commandLineResult["output"].as<std::string> ();
 	} else {
-		// Using the YML format, because string formats are easier to deal with
-		outputFile = std::filesystem::path (inputFile).stem ().string () + ".umii.yml";
+		outputFile = fmt::format ("{}{}{}", std::filesystem::path (inputFile).stem ().string (), ".umii", outputAsBinary ? "" : ".yml");
 	}
 
 	if (isVerbose) {
@@ -58,7 +67,7 @@ int main (int argc, char* argv[]) {
 		puts (fmt::format (
 			"| Input type: {}\n"
 			"| Input file: {}\n"
-			"| Output file: {}\n",
+			"| Output file: {}",
 		inputType, inputFile, outputFile).c_str ());
 		// clang-format on
 	}
@@ -294,7 +303,7 @@ int main (int argc, char* argv[]) {
 		"      lip_color: {}\n"
 		"    rito: !obj {{body_color: {}, hair_color: {}}}\n"
 		"    zora: !obj {{body_color: {}}}\n"
-		"  lists: {{}}\n",
+		"  lists: {{}}",
 
 		// Ffsd
 		info.ffsd_no_use_ffsd,
@@ -405,7 +414,7 @@ int main (int argc, char* argv[]) {
 	// clang-format on
 
 	if (isVerbose) {
-		puts (fmt::format ("| UMii output: \n{}\n\n", generatedUMii).c_str ());
+		puts (fmt::format ("| UMii output: \n\n{}\n", generatedUMii).c_str ());
 	}
 
 	std::ofstream outfile (outputFile, std::ofstream::binary);
@@ -416,6 +425,17 @@ int main (int argc, char* argv[]) {
 
 	outfile.write (generatedUMii.c_str (), generatedUMii.size ());
 	outfile.close ();
+
+	if (outputAsBinary) {
+		std::string commandLine = fmt::format ("yml_to_aamp {} {}", outputFile, outputFile);
+
+		if (isVerbose) {
+			puts ("| Generating UMii as Binary AAMP");
+			puts (fmt::format ("| {}", commandLine).c_str ());
+		}
+
+		HELPERS::exec (commandLine.c_str ());
+	}
 
 	return 0;
 }
