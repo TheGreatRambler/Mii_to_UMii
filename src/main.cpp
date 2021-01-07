@@ -273,6 +273,15 @@ int main (int argc, char* argv[]) {
 		outputFile = fmt::format ("{}{}", inputPath.stem ().string (), outputAsBinary ? ".bumii" : ".umii.yml");
 	}
 
+	if (!std::filesystem::exists (inputPath)) {
+		// clang-format off
+		puts (fmt::format (
+			"| Input file {} does not exist, aborting",
+		inputFile).c_str ());
+		// clang-format on
+		return 3;
+	}
+
 	if (isVerbose) {
 		// clang-format off
 		puts (fmt::format (
