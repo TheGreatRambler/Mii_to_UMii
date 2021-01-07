@@ -11,9 +11,9 @@
 			"program": "${workspaceFolder}/bin/miitoumii.exe",
 			"args": [
 				"-i",
-				"../3DS_Test_Female.cfsd",
+				"3DS_Test_Female.cfsd",
 				"-o",
-				"../3DS_Test_Female1.umii.yml",
+				"3DS_Test_Female1.umii.yml",
 				"-x",
 				"-t",
 				"3ds"
@@ -23,7 +23,7 @@
 				"exceptions": true
 			},
 			"stopAtEntry": false,
-			"cwd": "${workspaceFolder}/bin",
+			"cwd": "${workspaceFolder}",
 			"environment": [],
 			"externalConsole": true,
 			"MIMode": "gdb",
@@ -43,9 +43,9 @@
 			"program": "${workspaceFolder}/bin/miitoumii",
 			"args": [
 				"-i",
-				"../3DS_Test_Female.cfsd",
+				"3DS_Test_Female.cfsd",
 				"-o",
-				"../3DS_Test_Female1.umii.yml",
+				"3DS_Test_Female1.umii.yml",
 				"-x",
 				"-t",
 				"3ds"
@@ -55,7 +55,7 @@
 				"exceptions": true
 			},
 			"stopAtEntry": false,
-			"cwd": "${workspaceFolder}/bin",
+			"cwd": "${workspaceFolder}",
 			"environment": [],
 			"externalConsole": true,
 			"MIMode": "gdb",

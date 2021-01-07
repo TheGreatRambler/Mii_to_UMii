@@ -69,3 +69,9 @@ std::string HELPERS::bytesToHexString (unsigned char* info, unsigned int infoLen
 		return "";
 	}
 }
+
+std::string HELPERS::wstringToString (std::wstring string) {
+	using convert_type = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_type, wchar_t> converter;
+	return converter.to_bytes (string);
+}

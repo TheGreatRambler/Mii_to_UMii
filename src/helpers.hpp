@@ -2,10 +2,12 @@
 
 #include <array>
 #include <cmath>
+#include <codecvt>
 #include <cstdint>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
+#include <locale>
 #include <memory>
 #include <numeric>
 #include <sstream>
@@ -20,4 +22,6 @@ namespace HELPERS {
 	std::string bytesToHexString (unsigned char* info, unsigned int infoLength);
 
 	std::string exec (const char* cmd);
+
+	std::string wstringToString (std::wstring string);
 }

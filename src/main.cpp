@@ -2,7 +2,9 @@
 
 #include <ZXing/ReadBarcode.h>
 #include <ZXing/TextUtfEncoding.h>
-#include <aes.hpp>
+#include <cryptopp/aes.h>
+#include <cryptopp/ccm.h>
+#include <cryptopp/filters.h>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -304,21 +306,27 @@ int main (int argc, char* argv[]) {
 			// return 0;
 
 			ZXing::DecodeHints qrHints;
+			qrHints.setFormats (ZXing::BarcodeFormat::QR_CODE);
 
 			int width, height, channels;
 			std::unique_ptr<stbi_uc, void (*) (void*)> buffer (stbi_load (inputFile.c_str (), &width, &height, &channels, 4), stbi_image_free);
 
-			ZXing::Result result = ZXing::ReadBarcode ({ buffer.get (), width, height, ZXing::ImageFormat::RGBX }, qrHints);
-			ZXing::ByteArray bin = result.rawBytes ();
+			ZXing::Result result         = ZXing::ReadBarcode ({ buffer.get (), width, height, ZXing::ImageFormat::RGBX }, qrHints);
+			ZXing::ByteArray bin         = result.metadata ().getByteArrayList (ZXing::ResultMetadata::BYTE_SEGMENTS).front ();
+			ZXing::DecodeStatus qrStatus = result.status ();
+
+			std::string qrCodeCountry = HELPERS::wstringToString (result.metadata ().getString (ZXing::ResultMetadata::POSSIBLE_COUNTRY));
 
 			uint8_t* binPtr = bin.data ();
 
 			if (isVerbose) {
 				// clang-format off
 				puts (fmt::format (
-					"| Raw QR size: {}\n"
-					"| Raw QR:",
-				bin.size()).c_str ());
+					"| QR size: {}\n"
+					"| QR status: {}\n"
+					"| QR country: {}\n"
+					"| QR in hex:",
+				bin.size(), ZXing::ToString(qrStatus), qrCodeCountry).c_str ());
 				// clang-format on
 
 				static const int charactersPerLine = 50;
@@ -361,9 +369,18 @@ int main (int argc, char* argv[]) {
 			memcpy (nonceExtended, nonce, sizeof (nonce));
 			memset (&nonceExtended[8], 0, 4);
 
-			AES_ctx ctx;
-			AES_init_ctx_iv (&ctx, aesKey, nonceExtended);
-			AES_CBC_decrypt_buffer (&ctx, &binPtr[8], 88);
+			//AES_ctx ctx;
+			//AES_init_ctx_iv (&ctx, aesKey, nonceExtended);
+			//AES_CBC_decrypt_buffer (&ctx, &binPtr[8], 88);
+
+			// populate key and iv with the correct values
+
+			CryptoPP::CCM<CryptoPP::AES, 2>::Decryption d;
+			d.SetKeyWithIV (aesKey, sizeof (aesKey), nonceExtended, sizeof (nonceExtended));
+			d.SpecifyDataLengths (0, 86, 0);
+
+			CryptoPP::ArraySource (&binPtr[8], 88, true,
+				new CryptoPP::AuthenticatedDecryptionFilter (d, new CryptoPP::ArraySink (&binPtr[8], 88), CryptoPP::AuthenticatedDecryptionFilter::Flags::MAC_AT_END));
 
 			std::string tempName = fmt::format ("{}.temp", inputFile);
 
@@ -375,18 +392,36 @@ int main (int argc, char* argv[]) {
 				// clang-format on
 			}
 
+			uint8_t decodedMii[96];
+
+			memcpy (decodedMii, &binPtr[8], 12);
+			memcpy (&decodedMii[12], nonce, sizeof (nonce));
+			memcpy (&decodedMii[20], &binPtr[20], 76);
+
 			FILE* output = fopen (tempName.c_str (), "wb");
-			fwrite (binPtr, 12, 1, output);
-			fwrite (nonce, sizeof (nonce), 1, output);
-			fwrite (&binPtr[12], bin.size () - 12, 1, output);
+			fwrite (decodedMii, sizeof (decodedMii), 1, output);
 			fclose (output);
 
 			if (isVerbose) {
 				// clang-format off
 				puts (fmt::format (
-					"| File size: {}",
-				std::filesystem::file_size(std::filesystem::path(tempName))).c_str ());
+					"| File size: {}\n"
+					"| Decoded QR in hex:",
+				sizeof(decodedMii)).c_str ());
 				// clang-format on
+
+				static const int charactersPerLine = 50;
+
+				std::string hexString = HELPERS::bytesToHexString (decodedMii, sizeof (decodedMii));
+				size_t stringLength   = hexString.length ();
+				for (int index = 0; index < stringLength; index += charactersPerLine) {
+					bool atEnd = index + charactersPerLine > stringLength;
+					// clang-format off
+					puts (fmt::format (
+						"     {}",
+					hexString.substr(index, atEnd ? std::string::npos : charactersPerLine)).c_str ());
+					// clang-format on
+				}
 			}
 
 			is = new std::ifstream (tempName, std::ifstream::binary);
@@ -438,12 +473,12 @@ int main (int argc, char* argv[]) {
 		info.hair_type        = data.hair_type ();
 		info.hair_flip        = data.hair_flip ();
 		info.hair_color       = data.hair_color ();
-		info.eye_type         = data.eye ();
-		info.eyebrow_type     = data.eyebrow ();
-		info.nose_type        = data.nose ();
-		info.mouth_type       = data.mouth ();
-		info.beard_type       = data.beard ();
-		info.glass_type       = data.glasses ();
+		info.eye_type         = data.eye_type ();
+		info.eyebrow_type     = data.eyebrow_type ();
+		info.nose_type        = data.nose_type ();
+		info.mouth_type       = data.mouth_type ();
+		info.beard_type       = data.facial_hair_beard ();
+		info.glass_type       = data.glasses_type ();
 		info.personal_sex_age = data.gender () == 0 ? 1 : 4;
 		info.shape_jaw        = data.face_type ();
 
