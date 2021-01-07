@@ -19,11 +19,11 @@
 
 namespace ZXing {
 
-class BitArray;
+	class BitArray;
 
-namespace Aztec {
+	namespace Aztec {
 
-/**
+		/**
 * This produces nearly optimal encodings of text into the first-level of
 * encoding used by Aztec code.
 *
@@ -35,11 +35,10 @@ namespace Aztec {
 * @author Frank Yellin
 * @author Rustam Abdullaev
 */
-class HighLevelEncoder
-{
-public:
-	static BitArray Encode(const std::string& text);
-};
+		class HighLevelEncoder {
+		public:
+			static BitArray Encode (const std::string& text);
+		};
 
-} // Aztec
+	} // Aztec
 } // ZXing

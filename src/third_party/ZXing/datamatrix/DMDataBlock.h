@@ -21,33 +21,32 @@
 #include <vector>
 
 namespace ZXing {
-namespace DataMatrix {
+	namespace DataMatrix {
 
-class Version;
+		class Version;
 
-/**
+		/**
 * <p>Encapsulates a block of data within a Data Matrix Code. Data Matrix Codes may split their data into
 * multiple blocks, each of which is a unit of data and error-correction codewords. Each
 * is represented by an instance of this class.</p>
 *
 * @author bbrown@google.com (Brian Brown)
 */
-class DataBlock
-{
-public:
-	int numDataCodewords() const {
-		return _numDataCodewords;
-	}
+		class DataBlock {
+		public:
+			int numDataCodewords () const {
+				return _numDataCodewords;
+			}
 
-	const ByteArray& codewords() const {
-		return _codewords;
-	}
+			const ByteArray& codewords () const {
+				return _codewords;
+			}
 
-	ByteArray& codewords() {
-		return _codewords;
-	}
+			ByteArray& codewords () {
+				return _codewords;
+			}
 
-	/**
+			/**
 	* <p>When Data Matrix Codes use multiple data blocks, they actually interleave the bytes of each of them.
 	* That is, the first byte of data block 1 to n is written, then the second bytes, and so on. This
 	* method will separate the data into original blocks.</p>
@@ -57,12 +56,12 @@ public:
 	* @return DataBlocks containing original bytes, "de-interleaved" from representation in the
 	*         Data Matrix Code
 	*/
-	static std::vector<DataBlock> GetDataBlocks(const ByteArray& rawCodewords, const Version& version);
+			static std::vector<DataBlock> GetDataBlocks (const ByteArray& rawCodewords, const Version& version);
 
-private:
-	int _numDataCodewords = 0;
-	ByteArray _codewords;
-};
+		private:
+			int _numDataCodewords = 0;
+			ByteArray _codewords;
+		};
 
-} // DataMatrix
+	} // DataMatrix
 } // ZXing

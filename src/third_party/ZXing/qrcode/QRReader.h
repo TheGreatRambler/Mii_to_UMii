@@ -22,25 +22,24 @@
 
 namespace ZXing {
 
-class DecodeHints;
+	class DecodeHints;
 
-namespace QRCode {
+	namespace QRCode {
 
-/**
+		/**
 * This implementation can detect and decode QR Codes in an image.
 *
 * @author Sean Owen
 */
-class Reader : public ZXing::Reader
-{
-public:
-	explicit Reader(const DecodeHints& hints);
-	Result decode(const BinaryBitmap& image) const override;
+		class Reader : public ZXing::Reader {
+		public:
+			explicit Reader (const DecodeHints& hints);
+			Result decode (const BinaryBitmap& image) const override;
 
-private:
-	bool _tryHarder, _isPure;
-	std::string _charset;
-};
+		private:
+			bool _tryHarder, _isPure;
+			std::string _charset;
+		};
 
-} // QRCode
+	} // QRCode
 } // ZXing

@@ -19,44 +19,43 @@
 
 namespace ZXing {
 
-enum class CharacterSet;
-class BitMatrix;
+	enum class CharacterSet;
+	class BitMatrix;
 
-namespace Aztec {
+	namespace Aztec {
 
-class Writer
-{
-public:
-	Writer();
+		class Writer {
+		public:
+			Writer ();
 
-	Writer& setMargin(int margin) {
-		_margin = margin;
-		return *this;
-	}
+			Writer& setMargin (int margin) {
+				_margin = margin;
+				return *this;
+			}
 
-	Writer& setEncoding(CharacterSet encoding) {
-		_encoding = encoding;
-		return *this;
-	}
+			Writer& setEncoding (CharacterSet encoding) {
+				_encoding = encoding;
+				return *this;
+			}
 
-	Writer& setEccPercent(int percent) {
-		_eccPercent = percent;
-		return *this;
-	}
+			Writer& setEccPercent (int percent) {
+				_eccPercent = percent;
+				return *this;
+			}
 
-	Writer& setLayers(int layers) {
-		_layers = layers;
-		return *this;
-	}
+			Writer& setLayers (int layers) {
+				_layers = layers;
+				return *this;
+			}
 
-	BitMatrix encode(const std::wstring& contents, int width, int height) const;
+			BitMatrix encode (const std::wstring& contents, int width, int height) const;
 
-private:
-	CharacterSet _encoding;
-	int _eccPercent;
-	int _layers;
-	int _margin = 0;
-};
+		private:
+			CharacterSet _encoding;
+			int _eccPercent;
+			int _layers;
+			int _margin = 0;
+		};
 
-} // Aztec
+	} // Aztec
 } // ZXing

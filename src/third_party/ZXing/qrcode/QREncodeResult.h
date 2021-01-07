@@ -15,30 +15,29 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include "ByteArray.h"
 #include "BitMatrix.h"
+#include "ByteArray.h"
 #include "QRCodecMode.h"
 #include "QRVersion.h"
 
 namespace ZXing {
-namespace QRCode {
+	namespace QRCode {
 
-/**
+		/**
 * @author satorux@google.com (Satoru Takabayashi) - creator
 * @author dswitkin@google.com (Daniel Switkin) - ported from C++
 *
 * Original class name in Java was QRCode, as this name is taken already for the namespace,
 * so it's renamed here EncodeResult.
 */
-class EncodeResult
-{
-public:
-	ErrorCorrectionLevel ecLevel = ErrorCorrectionLevel::Invalid;
-	CodecMode::Mode mode = CodecMode::TERMINATOR;
-	const Version* version = nullptr;
-	int maskPattern = -1;
-	BitMatrix matrix;
-};
+		class EncodeResult {
+		public:
+			ErrorCorrectionLevel ecLevel = ErrorCorrectionLevel::Invalid;
+			CodecMode::Mode mode         = CodecMode::TERMINATOR;
+			const Version* version       = nullptr;
+			int maskPattern              = -1;
+			BitMatrix matrix;
+		};
 
-} // QRCode
+	} // QRCode
 } // ZXing

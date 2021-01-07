@@ -19,9 +19,9 @@
 #include "TritMatrix.h"
 
 namespace ZXing {
-namespace QRCode {
-namespace MaskUtil {
-	int CalculateMaskPenalty(const TritMatrix& matrix);
-}
-} // QRCode
+	namespace QRCode {
+		namespace MaskUtil {
+			int CalculateMaskPenalty (const TritMatrix& matrix);
+		}
+	} // QRCode
 } // ZXing

@@ -31,7 +31,7 @@ namespace kaitai {
 			, m_src_path (src_path) {
 		}
 
-		virtual ~kstruct_error () KS_NOEXCEPT {};
+		virtual ~kstruct_error () KS_NOEXCEPT{};
 
 	protected:
 		const std::string m_src_path;
@@ -48,7 +48,7 @@ namespace kaitai {
 			: kstruct_error ("unable to decide on endianness for a type", src_path) {
 		}
 
-		virtual ~undecided_endianness_error () KS_NOEXCEPT {};
+		virtual ~undecided_endianness_error () KS_NOEXCEPT{};
 	};
 
 	/**
@@ -64,7 +64,7 @@ namespace kaitai {
 
 		// "at pos #{io.pos}: validation failed: #{msg}"
 
-		virtual ~validation_failed_error () KS_NOEXCEPT {};
+		virtual ~validation_failed_error () KS_NOEXCEPT{};
 
 	protected:
 		kstream* m_io;
@@ -85,7 +85,7 @@ namespace kaitai {
 
 		// "not equal, expected #{expected.inspect}, but got #{actual.inspect}"
 
-		virtual ~validation_not_equal_error<T> () KS_NOEXCEPT {};
+		virtual ~validation_not_equal_error<T> () KS_NOEXCEPT{};
 
 	protected:
 		const T& m_expected;
@@ -107,7 +107,7 @@ namespace kaitai {
 
 		// "not in range, min #{min.inspect}, but got #{actual.inspect}"
 
-		virtual ~validation_less_than_error<T> () KS_NOEXCEPT {};
+		virtual ~validation_less_than_error<T> () KS_NOEXCEPT{};
 
 	protected:
 		const T& m_min;
@@ -129,7 +129,7 @@ namespace kaitai {
 
 		// "not in range, max #{max.inspect}, but got #{actual.inspect}"
 
-		virtual ~validation_greater_than_error<T> () KS_NOEXCEPT {};
+		virtual ~validation_greater_than_error<T> () KS_NOEXCEPT{};
 
 	protected:
 		const T& m_max;
@@ -150,7 +150,7 @@ namespace kaitai {
 
 		// "not any of the list, got #{actual.inspect}"
 
-		virtual ~validation_not_any_of_error<T> () KS_NOEXCEPT {};
+		virtual ~validation_not_any_of_error<T> () KS_NOEXCEPT{};
 
 	protected:
 		const T& m_actual;
@@ -170,12 +170,11 @@ namespace kaitai {
 
 		// "not matching the expression, got #{actual.inspect}"
 
-		virtual ~validation_expr_error<T> () KS_NOEXCEPT {};
+		virtual ~validation_expr_error<T> () KS_NOEXCEPT{};
 
 	protected:
 		const T& m_actual;
 	};
-
 }
 
 #endif

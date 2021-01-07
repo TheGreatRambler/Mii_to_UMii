@@ -22,11 +22,11 @@
 
 namespace ZXing {
 
-class DecodeHints;
+	class DecodeHints;
 
-namespace OneD {
+	namespace OneD {
 
-/**
+		/**
 * <p>Implements decoding of the ITF format, or Interleaved Two of Five.</p>
 *
 * <p>This Reader will scan ITF barcodes of certain lengths only.
@@ -42,16 +42,15 @@ namespace OneD {
 *
 * @author kevin.osullivan@sita.aero, SITA Lab.
 */
-class ITFReader : public RowReader
-{
-public:
-	explicit ITFReader(const DecodeHints& hints);
-	Result decodeRow(int rowNumber, const BitArray& row, std::unique_ptr<DecodingState>& state) const override;
-	Result decodePattern(int rowNumber, const PatternView& row, std::unique_ptr<DecodingState>&) const override;
+		class ITFReader : public RowReader {
+		public:
+			explicit ITFReader (const DecodeHints& hints);
+			Result decodeRow (int rowNumber, const BitArray& row, std::unique_ptr<DecodingState>& state) const override;
+			Result decodePattern (int rowNumber, const PatternView& row, std::unique_ptr<DecodingState>&) const override;
 
-private:
-	std::vector<int> _allowedLengths;
-};
+		private:
+			std::vector<int> _allowedLengths;
+		};
 
-} // OneD
+	} // OneD
 } // ZXing

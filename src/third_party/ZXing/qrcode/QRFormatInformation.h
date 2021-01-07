@@ -21,9 +21,9 @@
 #include <cstdint>
 
 namespace ZXing {
-namespace QRCode {
+	namespace QRCode {
 
-/**
+		/**
 * <p>Encapsulates a QR Code's format information, including the data mask used and
 * error correction level.</p>
 *
@@ -31,35 +31,36 @@ namespace QRCode {
 * @see DataMask
 * @see ErrorCorrectionLevel
 */
-class FormatInformation
-{
-public:
-	FormatInformation() = default;
+		class FormatInformation {
+		public:
+			FormatInformation () = default;
 
-	static FormatInformation DecodeFormatInformation(int maskedFormatInfo1, int maskedFormatInfo2);
+			static FormatInformation DecodeFormatInformation (int maskedFormatInfo1, int maskedFormatInfo2);
 
-	ErrorCorrectionLevel errorCorrectionLevel() const {
-		return _errorCorrectionLevel;
-	}
+			ErrorCorrectionLevel errorCorrectionLevel () const {
+				return _errorCorrectionLevel;
+			}
 
-	uint8_t dataMask() const {
-		return _dataMask;
-	}
+			uint8_t dataMask () const {
+				return _dataMask;
+			}
 
-	bool isValid() const { return _errorCorrectionLevel != ErrorCorrectionLevel::Invalid; }
+			bool isValid () const {
+				return _errorCorrectionLevel != ErrorCorrectionLevel::Invalid;
+			}
 
-	bool operator==(const FormatInformation& other) const {
-		return _dataMask == other._dataMask && _errorCorrectionLevel == other._errorCorrectionLevel;
-	}
+			bool operator== (const FormatInformation& other) const {
+				return _dataMask == other._dataMask && _errorCorrectionLevel == other._errorCorrectionLevel;
+			}
 
-private:
-	ErrorCorrectionLevel _errorCorrectionLevel = ErrorCorrectionLevel::Invalid;
-	uint8_t _dataMask = 0;
+		private:
+			ErrorCorrectionLevel _errorCorrectionLevel = ErrorCorrectionLevel::Invalid;
+			uint8_t _dataMask                          = 0;
 
-	FormatInformation(int formatInfo);
+			FormatInformation (int formatInfo);
 
-	static FormatInformation DoDecodeFormatInformation(int maskedFormatInfo1, int maskedFormatInfo2);
-};
+			static FormatInformation DoDecodeFormatInformation (int maskedFormatInfo1, int maskedFormatInfo2);
+		};
 
-} // QRCode
+	} // QRCode
 } // ZXing

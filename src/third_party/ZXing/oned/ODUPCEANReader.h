@@ -18,20 +18,20 @@
 
 #include "ODRowReader.h"
 
+#include <array>
 #include <cassert>
 #include <string>
-#include <array>
 #include <vector>
 
 namespace ZXing {
 
-class DecodeHints;
-enum class BarcodeFormat;
-enum class DecodeStatus;
+	class DecodeHints;
+	enum class BarcodeFormat;
+	enum class DecodeStatus;
 
-namespace OneD {
+	namespace OneD {
 
-/**
+		/**
 * <p>Encapsulates functionality and implementation that is common to UPC and EAN families
 * of one-dimensional barcodes.</p>
 *
@@ -39,12 +39,11 @@ namespace OneD {
 * @author Sean Owen
 * @author alasdair@google.com (Alasdair Mackintosh)
 */
-class UPCEANReader : public RowReader
-{
-public:
-	Result decodeRow(int rowNumber, const BitArray& row, std::unique_ptr<DecodingState>& state) const override;
+		class UPCEANReader : public RowReader {
+		public:
+			Result decodeRow (int rowNumber, const BitArray& row, std::unique_ptr<DecodingState>& state) const override;
 
-	/**
+			/**
 	* <p>Like {@link #decodeRow(int, BitArray, java.util.Map)}, but
 	* allows caller to inform method about where the UPC/EAN start pattern is
 	* found. This allows this to be computed once and reused across many implementations.</p>
@@ -58,25 +57,25 @@ public:
 	* @throws ChecksumException if a potential barcode is found but does not pass its checksum
 	* @throws FormatException if a potential barcode is found but format is invalid
 	*/
-	virtual Result decodeRow(int rowNumber, const BitArray& row, BitArray::Range startGuard) const;
+			virtual Result decodeRow (int rowNumber, const BitArray& row, BitArray::Range startGuard) const;
 
-	using Digit = std::array<int, 4>;
+			using Digit = std::array<int, 4>;
 
-	// These two values are critical for determining how permissive the decoding will be.
-	// We've arrived at these values through a lot of trial and error. Setting them any higher
-	// lets false positives creep in quickly.
-	static constexpr float MAX_AVG_VARIANCE = 0.48f;
-	static constexpr float MAX_INDIVIDUAL_VARIANCE = 0.7f;
+			// These two values are critical for determining how permissive the decoding will be.
+			// We've arrived at these values through a lot of trial and error. Setting them any higher
+			// lets false positives creep in quickly.
+			static constexpr float MAX_AVG_VARIANCE        = 0.48f;
+			static constexpr float MAX_INDIVIDUAL_VARIANCE = 0.7f;
 
-protected:
-	explicit UPCEANReader(const DecodeHints& hints);
+		protected:
+			explicit UPCEANReader (const DecodeHints& hints);
 
-	/**
+			/**
 	* Get the format of this decoder.
 	*/
-	virtual BarcodeFormat expectedFormat() const = 0;
+			virtual BarcodeFormat expectedFormat () const = 0;
 
-	/**
+			/**
 	* Subclasses override this to decode the portion of a barcode between the start
 	* and end guard patterns.
 	*
@@ -85,22 +84,21 @@ protected:
 	* @param resultString {@link StringBuilder} to append decoded chars to
 	* @throws NotFoundException if decoding could not complete successfully
 	*/
-	virtual BitArray::Range decodeMiddle(const BitArray& row, BitArray::Iterator begin, std::string& resultString) const = 0;
+			virtual BitArray::Range decodeMiddle (const BitArray& row, BitArray::Iterator begin, std::string& resultString) const = 0;
 
-	/**
+			/**
 	* @param s string of digits to check
 	* @return {@link #checkStandardUPCEANChecksum(CharSequence)}
 	* @throws FormatException if the string does not contain only digits
 	*/
-	virtual	bool checkChecksum(const std::string& s) const;
+			virtual bool checkChecksum (const std::string& s) const;
 
+			virtual BitArray::Range decodeEnd (const BitArray& row, BitArray::Iterator begin) const;
 
-	virtual BitArray::Range decodeEnd(const BitArray& row, BitArray::Iterator begin) const;
+		public:
+			static BitArray::Range FindStartGuardPattern (const BitArray& row);
 
-public:
-	static BitArray::Range FindStartGuardPattern(const BitArray& row);
-
-	/**
+			/**
 	* Attempts to read and decode a single UPC/EAN-encoded digit.
 	*
 	* @param counters the counts of runs of observed black/white/black/... values
@@ -110,41 +108,42 @@ public:
 	* @return index best matching pattern, -1 if counters could not be matched
 	* @throws NotFoundException if digit cannot be decoded
 	*/
-	template <size_t N>
-	static int DecodeDigit(BitArray::Range* next, const std::array<Digit, N>& patterns, std::string* resultString) {
-		assert(next && resultString);
+			template <size_t N>
+			static int DecodeDigit (BitArray::Range* next, const std::array<Digit, N>& patterns, std::string* resultString) {
+				assert (next && resultString);
 
-		Digit counters = {};
-		auto range = RowReader::RecordPattern(next->begin, next->end, counters);
-		if (!range)
-			return -1;
-		next->begin = range.end;
+				Digit counters = {};
+				auto range     = RowReader::RecordPattern (next->begin, next->end, counters);
+				if (!range)
+					return -1;
+				next->begin = range.end;
 
-		int bestMatch = RowReader::DecodeDigit(counters, patterns, MAX_AVG_VARIANCE, MAX_INDIVIDUAL_VARIANCE, false);
-		if (bestMatch != -1)
-			resultString->push_back((char)('0' + bestMatch % 10));
+				int bestMatch = RowReader::DecodeDigit (counters, patterns, MAX_AVG_VARIANCE, MAX_INDIVIDUAL_VARIANCE, false);
+				if (bestMatch != -1)
+					resultString->push_back ((char)('0' + bestMatch % 10));
 
-		return bestMatch;
-	}
+				return bestMatch;
+			}
 
-	/**
+			/**
 	 * Similar to DecodeDigit. Detects a single guard pattern instead of a digit.
 	 * */
-	template <size_t N>
-	static bool ReadGuardPattern(BitArray::Range* next, const std::array<int, N>& pattern) {
-		assert(next);
+			template <size_t N>
+			static bool ReadGuardPattern (BitArray::Range* next, const std::array<int, N>& pattern) {
+				assert (next);
 
-		std::array<int, N> counters = {};
-		auto range = RowReader::RecordPattern(next->begin, next->end, counters);
-		if (!range || RowReader::PatternMatchVariance(counters, pattern, MAX_INDIVIDUAL_VARIANCE) >= MAX_AVG_VARIANCE)
-			return false;
+				std::array<int, N> counters = {};
+				auto range                  = RowReader::RecordPattern (next->begin, next->end, counters);
+				if (!range || RowReader::PatternMatchVariance (counters, pattern, MAX_INDIVIDUAL_VARIANCE) >= MAX_AVG_VARIANCE)
+					return false;
 
-		next->begin = range.end;
-		return true;
-	}
-private:
-	std::vector<int> _allowedExtensions;
-};
+				next->begin = range.end;
+				return true;
+			}
 
-} // OneD
+		private:
+			std::vector<int> _allowedExtensions;
+		};
+
+	} // OneD
 } // ZXing

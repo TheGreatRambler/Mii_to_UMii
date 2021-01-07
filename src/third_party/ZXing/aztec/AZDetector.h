@@ -18,31 +18,30 @@
 
 namespace ZXing {
 
-class BitMatrix;
+	class BitMatrix;
 
-namespace Aztec {
+	namespace Aztec {
 
-class DetectorResult;
+		class DetectorResult;
 
-/**
+		/**
 * Encapsulates logic that can detect an Aztec Code in an image, even if the Aztec Code
 * is rotated or skewed, or partially obscured.
 *
 * @author David Olivier
 * @author Frank Yellin
 */
-class Detector
-{
-public:
-	/**
+		class Detector {
+		public:
+			/**
 	* Detects an Aztec Code in an image.
 	*
 	* @param isMirror if true, image is a mirror-image of original
 	* @return {@link AztecDetectorResult} encapsulating results of detecting an Aztec Code
 	* @throws NotFoundException if no Aztec Code can be found
 	*/
-	static DetectorResult Detect(const BitMatrix& image, bool isMirror);
-};
+			static DetectorResult Detect (const BitMatrix& image, bool isMirror);
+		};
 
-} // Aztec
+	} // Aztec
 } // ZXing

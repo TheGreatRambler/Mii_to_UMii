@@ -23,62 +23,60 @@
 #include <vector>
 
 namespace ZXing {
-namespace Pdf417 {
+	namespace Pdf417 {
 
-/**
+		/**
 * @author Guenther Grau
 */
-class DetectionResult
-{
-	BarcodeMetadata _barcodeMetadata;
-	std::vector<Nullable<DetectionResultColumn>> _detectionResultColumns;
-	Nullable<BoundingBox> _boundingBox;
+		class DetectionResult {
+			BarcodeMetadata _barcodeMetadata;
+			std::vector<Nullable<DetectionResultColumn>> _detectionResultColumns;
+			Nullable<BoundingBox> _boundingBox;
 
-public:
-	DetectionResult() = default;
-	DetectionResult(const BarcodeMetadata& barcodeMetadata, const Nullable<BoundingBox>& boundingBox);
+		public:
+			DetectionResult () = default;
+			DetectionResult (const BarcodeMetadata& barcodeMetadata, const Nullable<BoundingBox>& boundingBox);
 
-	void init(const BarcodeMetadata& barcodeMetadata, const Nullable<BoundingBox>& boundingBox);
+			void init (const BarcodeMetadata& barcodeMetadata, const Nullable<BoundingBox>& boundingBox);
 
-	const std::vector<Nullable<DetectionResultColumn>> & allColumns();
+			const std::vector<Nullable<DetectionResultColumn>>& allColumns ();
 
-	int barcodeColumnCount() const {
-		return _barcodeMetadata.columnCount();
-	}
+			int barcodeColumnCount () const {
+				return _barcodeMetadata.columnCount ();
+			}
 
-	int barcodeRowCount() const {
-		return _barcodeMetadata.rowCount();
-	}
+			int barcodeRowCount () const {
+				return _barcodeMetadata.rowCount ();
+			}
 
-	int barcodeECLevel() const {
-		return _barcodeMetadata.errorCorrectionLevel();
-	}
+			int barcodeECLevel () const {
+				return _barcodeMetadata.errorCorrectionLevel ();
+			}
 
-	void setBoundingBox(const BoundingBox& boundingBox) {
-		_boundingBox = boundingBox;
-	}
+			void setBoundingBox (const BoundingBox& boundingBox) {
+				_boundingBox = boundingBox;
+			}
 
-	const Nullable<BoundingBox> & getBoundingBox() const {
-		return _boundingBox;
-	}
+			const Nullable<BoundingBox>& getBoundingBox () const {
+				return _boundingBox;
+			}
 
-	void setBoundingBox(const Nullable<BoundingBox>& box) {
-		_boundingBox = box;
-	}
+			void setBoundingBox (const Nullable<BoundingBox>& box) {
+				_boundingBox = box;
+			}
 
-	void setColumn(int barcodeColumn, const Nullable<DetectionResultColumn>& detectionResultColumn) {
-		_detectionResultColumns[barcodeColumn] = detectionResultColumn;
-	}
+			void setColumn (int barcodeColumn, const Nullable<DetectionResultColumn>& detectionResultColumn) {
+				_detectionResultColumns[barcodeColumn] = detectionResultColumn;
+			}
 
-	const Nullable<DetectionResultColumn>& column(int barcodeColumn) const {
-		return _detectionResultColumns[barcodeColumn];
-	}
+			const Nullable<DetectionResultColumn>& column (int barcodeColumn) const {
+				return _detectionResultColumns[barcodeColumn];
+			}
 
-	Nullable<DetectionResultColumn>& column(int barcodeColumn) {
-		return _detectionResultColumns[barcodeColumn];
-	}
+			Nullable<DetectionResultColumn>& column (int barcodeColumn) {
+				return _detectionResultColumns[barcodeColumn];
+			}
+		};
 
-};
-
-} // Pdf417
+	} // Pdf417
 } // ZXing

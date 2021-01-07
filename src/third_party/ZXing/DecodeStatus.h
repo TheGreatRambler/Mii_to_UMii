@@ -19,31 +19,27 @@
 
 namespace ZXing {
 
-enum class DecodeStatus
-{
-	NoError = 0,
-	NotFound,
-	FormatError,
-	ChecksumError,
+	enum class DecodeStatus {
+		NoError = 0,
+		NotFound,
+		FormatError,
+		ChecksumError,
 #ifdef ZX_USE_NEW_ROW_READERS
-	_internal // this is for internal/temporary use until all 1D readers support the new Pattern API
+		_internal // this is for internal/temporary use until all 1D readers support the new Pattern API
 #endif
-};
+	};
 
-inline bool StatusIsOK(DecodeStatus status)
-{
-	return status == DecodeStatus::NoError;
-}
+	inline bool StatusIsOK (DecodeStatus status) {
+		return status == DecodeStatus::NoError;
+	}
 
-inline bool StatusIsError(DecodeStatus status)
-{
-	return status != DecodeStatus::NoError;
-}
+	inline bool StatusIsError (DecodeStatus status) {
+		return status != DecodeStatus::NoError;
+	}
 
-inline const char* ToString(DecodeStatus status)
-{
-	constexpr const char* names[] = {"NoError", "NotFound", "FormatError", "ChecksumError"};
-	return names[static_cast<int>(status)];
-}
+	inline const char* ToString (DecodeStatus status) {
+		constexpr const char* names[] = { "NoError", "NotFound", "FormatError", "ChecksumError" };
+		return names[static_cast<int> (status)];
+	}
 
 } // ZXing

@@ -18,13 +18,13 @@
 
 namespace ZXing {
 
-class BitMatrix;
+	class BitMatrix;
 
-namespace QRCode {
+	namespace QRCode {
 
-class AlignmentPattern;
+		class AlignmentPattern;
 
-/**
+		/**
 * <p>This class attempts to find alignment patterns in a QR Code. Alignment patterns look like finder
 * patterns but are smaller and appear at regular intervals throughout the image.</p>
 *
@@ -38,10 +38,9 @@ class AlignmentPattern;
 *
 * @author Sean Owen
 */
-class AlignmentPatternFinder
-{
-public:
-	/**
+		class AlignmentPatternFinder {
+		public:
+			/**
 	* <p>This method attempts to find the bottom-right alignment pattern in the image. It is a bit messy since
 	* it's pretty performance-critical and so is written to be fast foremost.</p>
 	* @param image image to search
@@ -54,8 +53,8 @@ public:
 	* @return {@link AlignmentPattern} if found
 	* @throws NotFoundException if not found
 	*/
-	static AlignmentPattern Find(const BitMatrix& image, int startX, int startY, int width, int height, float moduleSize);
-};
+			static AlignmentPattern Find (const BitMatrix& image, int startX, int startY, int width, int height, float moduleSize);
+		};
 
-} // QRCode
+	} // QRCode
 } // ZXing

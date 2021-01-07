@@ -17,27 +17,26 @@
 */
 
 namespace ZXing {
-namespace QRCode {
+	namespace QRCode {
 
-/**
+		/**
 * <p>See ISO 18004:2006, 6.5.1. This enum encapsulates the four error correction levels
 * defined by the QR code standard.</p>
 *
 * @author Sean Owen
 */
-enum class ErrorCorrectionLevel
-{
-	Low,			// L = ~7 % correction
-	Medium,			// M = ~15% correction
-	Quality,		// Q = ~25% correction
-	High,			// H = ~30% correction
-	Invalid,		// denotes in invalid/unknown value
-};
+		enum class ErrorCorrectionLevel {
+			Low,     // L = ~7 % correction
+			Medium,  // M = ~15% correction
+			Quality, // Q = ~25% correction
+			High,    // H = ~30% correction
+			Invalid, // denotes in invalid/unknown value
+		};
 
-const wchar_t* ToString(ErrorCorrectionLevel l);
-ErrorCorrectionLevel ECLevelFromString(const char* str);
-ErrorCorrectionLevel ECLevelFromBits(int bits);
-int BitsFromECLevel(ErrorCorrectionLevel l);
+		const wchar_t* ToString (ErrorCorrectionLevel l);
+		ErrorCorrectionLevel ECLevelFromString (const char* str);
+		ErrorCorrectionLevel ECLevelFromBits (int bits);
+		int BitsFromECLevel (ErrorCorrectionLevel l);
 
-} // QRCode
+	} // QRCode
 } // ZXing

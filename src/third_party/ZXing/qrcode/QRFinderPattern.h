@@ -19,49 +19,48 @@
 #include "ResultPoint.h"
 
 namespace ZXing {
-namespace QRCode {
+	namespace QRCode {
 
-/**
+		/**
 * <p>Encapsulates a finder pattern, which are the three square patterns found in
 * the corners of QR Codes. It also encapsulates a count of similar finder patterns,
 * as a convenience to the finder's bookkeeping.</p>
 *
 * @author Sean Owen
 */
-class FinderPattern : public ResultPoint
-{
-	float _estimatedModuleSize = 0;
-	int _count = 0;
+		class FinderPattern : public ResultPoint {
+			float _estimatedModuleSize = 0;
+			int _count                 = 0;
 
-public:
-	FinderPattern() = default;
-	FinderPattern(float posX, float posY, float estimatedModuleSize, int count = 1);
+		public:
+			FinderPattern () = default;
+			FinderPattern (float posX, float posY, float estimatedModuleSize, int count = 1);
 
-	float estimatedModuleSize() const {
-		return _estimatedModuleSize;
-	}
+			float estimatedModuleSize () const {
+				return _estimatedModuleSize;
+			}
 
-	int count() const {
-		return _count;
-	}
+			int count () const {
+				return _count;
+			}
 
-	bool isValid() const {
-		return _count > 0;
-	}
+			bool isValid () const {
+				return _count > 0;
+			}
 
-	/**
+			/**
 	* <p>Determines if this finder pattern "about equals" a finder pattern at the stated
 	* position and size -- meaning, it is at nearly the same center with nearly the same size.</p>
 	*/
-	bool aboutEquals(float moduleSize, float i, float j) const;
+			bool aboutEquals (float moduleSize, float i, float j) const;
 
-	/**
+			/**
 	* Combines this object's current estimate of a finder pattern position and module size
 	* with a new estimate. It returns a new {@code FinderPattern} containing a weighted average
 	* based on count.
 	*/
-	FinderPattern combineEstimate(float i, float j, float newModuleSize) const;
-};
+			FinderPattern combineEstimate (float i, float j, float newModuleSize) const;
+		};
 
-} // QRCode
+	} // QRCode
 } // ZXing

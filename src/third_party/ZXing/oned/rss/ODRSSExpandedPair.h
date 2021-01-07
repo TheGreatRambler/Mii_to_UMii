@@ -20,55 +20,57 @@
 #include "ODRSSFinderPattern.h"
 
 namespace ZXing {
-namespace OneD {
-namespace RSS {
+	namespace OneD {
+		namespace RSS {
 
-/**
+			/**
 * @author Pablo Orduña, University of Deusto (pablo.orduna@deusto.es)
 */
-class ExpandedPair
-{
-	DataCharacter _leftChar;
-	DataCharacter _rightChar;
-	FinderPattern _finderPattern;
-	bool _mayBeLast = false;
+			class ExpandedPair {
+				DataCharacter _leftChar;
+				DataCharacter _rightChar;
+				FinderPattern _finderPattern;
+				bool _mayBeLast = false;
 
-public:
-	ExpandedPair() = default;
-	ExpandedPair(const DataCharacter& leftChar, const DataCharacter& rightChar, const FinderPattern& finderPattern, bool mayBeLast) :
-		_leftChar(leftChar), _rightChar(rightChar), _finderPattern(finderPattern), _mayBeLast(mayBeLast) {}
+			public:
+				ExpandedPair () = default;
+				ExpandedPair (const DataCharacter& leftChar, const DataCharacter& rightChar, const FinderPattern& finderPattern, bool mayBeLast)
+					: _leftChar (leftChar)
+					, _rightChar (rightChar)
+					, _finderPattern (finderPattern)
+					, _mayBeLast (mayBeLast) {}
 
-	bool mayBeLast() const {
-		return _mayBeLast;
-	}
+				bool mayBeLast () const {
+					return _mayBeLast;
+				}
 
-	const DataCharacter& leftChar() const {
-		return _leftChar;
-	}
+				const DataCharacter& leftChar () const {
+					return _leftChar;
+				}
 
-	const DataCharacter& rightChar() const {
-		return _rightChar;
-	}
+				const DataCharacter& rightChar () const {
+					return _rightChar;
+				}
 
-	const FinderPattern& finderPattern() const {
-		return _finderPattern;
-	}
+				const FinderPattern& finderPattern () const {
+					return _finderPattern;
+				}
 
-	bool mustBeLast() const {
-		return !_rightChar.isValid();
-	}
+				bool mustBeLast () const {
+					return !_rightChar.isValid ();
+				}
 
-	bool operator==(const ExpandedPair& other) const {
-		return _leftChar == other._leftChar
-			&& _rightChar == other._rightChar
-			&& _finderPattern.value() == other._finderPattern.value();
-	}
-	
-	bool operator!=(const ExpandedPair& other) const {
-		return !(*this == other);
-	}	
-};
+				bool operator== (const ExpandedPair& other) const {
+					return _leftChar == other._leftChar
+						   && _rightChar == other._rightChar
+						   && _finderPattern.value () == other._finderPattern.value ();
+				}
 
-} // RSS
-} // OneD
+				bool operator!= (const ExpandedPair& other) const {
+					return !(*this == other);
+				}
+			};
+
+		} // RSS
+	}     // OneD
 } // ZXing

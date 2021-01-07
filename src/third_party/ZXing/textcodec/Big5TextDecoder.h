@@ -32,12 +32,11 @@
 **
 ****************************************************************************/
 
-#include <vector>
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
+#include <vector>
 
-class Big5TextDecoder
-{
+class Big5TextDecoder {
 public:
-	static void AppendBig5(std::vector<uint16_t>& utf16, const uint8_t* bytes, size_t length);
+	static void AppendBig5 (std::vector<uint16_t>& utf16, const uint8_t* bytes, size_t length);
 };

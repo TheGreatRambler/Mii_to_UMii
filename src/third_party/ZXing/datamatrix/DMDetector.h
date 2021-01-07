@@ -18,28 +18,27 @@
 
 namespace ZXing {
 
-class BitMatrix;
-class DetectorResult;
+	class BitMatrix;
+	class DetectorResult;
 
-namespace DataMatrix {
+	namespace DataMatrix {
 
-/**
+		/**
 * <p>Encapsulates logic that can detect a Data Matrix Code in an image, even if the Data Matrix Code
 * is rotated or skewed, or partially obscured.</p>
 *
 * @author Sean Owen, Axel Waggershauser
 */
-class Detector
-{
-public:
-	/**
+		class Detector {
+		public:
+			/**
 	* <p>Detects a Data Matrix Code in an image.</p>
 	*
 	* @return {@link DetectorResult} encapsulating results of detecting a Data Matrix Code
 	* @throws NotFoundException if no Data Matrix Code can be found
 	*/
-	static DetectorResult Detect(const BitMatrix& image, bool tryHarder, bool tryRotate, bool isPure);
-};
+			static DetectorResult Detect (const BitMatrix& image, bool tryHarder, bool tryRotate, bool isPure);
+		};
 
-} // DataMatrix
+	} // DataMatrix
 } // ZXing

@@ -22,44 +22,45 @@
 #include <vector>
 
 namespace ZXing {
-namespace OneD {
-namespace RSS {
+	namespace OneD {
+		namespace RSS {
 
-/**
+			/**
 * One row of an RSS Expanded Stacked symbol, consisting of 1+ expanded pairs.
 */
-class ExpandedRow
-{
-	std::vector<ExpandedPair> _pairs;
-	int _rowNumber;
-	/** Did this row of the image have to be reversed (mirrored) to recognize the pairs? */
-	bool _wasReversed;
+			class ExpandedRow {
+				std::vector<ExpandedPair> _pairs;
+				int _rowNumber;
+				/** Did this row of the image have to be reversed (mirrored) to recognize the pairs? */
+				bool _wasReversed;
 
-public:
-	template <typename U>
-	ExpandedRow(const U& pairs, int rowNumber, bool wasReversed) : _rowNumber(rowNumber), _wasReversed(wasReversed) {
-		_pairs.reserve(pairs.size());
-		_pairs.assign(pairs.begin(), pairs.end());
-	}
+			public:
+				template <typename U>
+				ExpandedRow (const U& pairs, int rowNumber, bool wasReversed)
+					: _rowNumber (rowNumber)
+					, _wasReversed (wasReversed) {
+					_pairs.reserve (pairs.size ());
+					_pairs.assign (pairs.begin (), pairs.end ());
+				}
 
-	const std::vector<ExpandedPair>& pairs() const {
-		return _pairs;
-	}
+				const std::vector<ExpandedPair>& pairs () const {
+					return _pairs;
+				}
 
-	int rowNumber() const {
-		return _rowNumber;
-	}
+				int rowNumber () const {
+					return _rowNumber;
+				}
 
-	bool wasReversed() const {
-		return _wasReversed;
-	}
+				bool wasReversed () const {
+					return _wasReversed;
+				}
 
-	template <typename U>
-	bool isEquivalent(const U& list) const {
-		return _pairs.size() == list.size() && std::equal(_pairs.begin(), _pairs.end(), list.begin());
-	}
-};
+				template <typename U>
+				bool isEquivalent (const U& list) const {
+					return _pairs.size () == list.size () && std::equal (_pairs.begin (), _pairs.end (), list.begin ());
+				}
+			};
 
-} // RSS
-} // OneD
+		} // RSS
+	}     // OneD
 } // ZXing

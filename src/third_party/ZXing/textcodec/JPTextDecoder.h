@@ -61,13 +61,12 @@
  * SUCH DAMAGE.
  */
 
-#include <vector>
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
+#include <vector>
 
-class JPTextDecoder
-{
+class JPTextDecoder {
 public:
-	static void AppendShiftJIS(std::vector<uint16_t>& utf16, const uint8_t* bytes, size_t length);
-	static void AppendEUCJP(std::vector<uint16_t>& utf16, const uint8_t* bytes, size_t length);
+	static void AppendShiftJIS (std::vector<uint16_t>& utf16, const uint8_t* bytes, size_t length);
+	static void AppendEUCJP (std::vector<uint16_t>& utf16, const uint8_t* bytes, size_t length);
 };

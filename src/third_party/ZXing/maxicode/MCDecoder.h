@@ -18,22 +18,21 @@
 
 namespace ZXing {
 
-class DecoderResult;
-class BitMatrix;
+	class DecoderResult;
+	class BitMatrix;
 
-namespace MaxiCode {
+	namespace MaxiCode {
 
-/**
+		/**
 * <p>The main class which implements MaxiCode decoding -- as opposed to locating and extracting
 * the MaxiCode from an image.</p>
 *
 * @author Manuel Kasten
 */
-class Decoder
-{
-public:
-	static DecoderResult Decode(const BitMatrix& bits);
-};
+		class Decoder {
+		public:
+			static DecoderResult Decode (const BitMatrix& bits);
+		};
 
-} // MaxiCode
+	} // MaxiCode
 } // ZXing

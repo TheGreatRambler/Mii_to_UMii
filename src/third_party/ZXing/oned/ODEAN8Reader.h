@@ -19,22 +19,22 @@
 #include "ODUPCEANReader.h"
 
 namespace ZXing {
-namespace OneD {
+	namespace OneD {
 
-/**
+		/**
 * <p>Implements decoding of the EAN-8 format.</p>
 *
 * @author Sean Owen
 */
-class EAN8Reader : public UPCEANReader
-{
-public:
-	explicit EAN8Reader(const DecodeHints& hints) : UPCEANReader(hints) {}
+		class EAN8Reader : public UPCEANReader {
+		public:
+			explicit EAN8Reader (const DecodeHints& hints)
+				: UPCEANReader (hints) {}
 
-protected:
-	BarcodeFormat expectedFormat() const override;
-	BitArray::Range decodeMiddle(const BitArray& row, BitArray::Iterator begin, std::string& resultString) const override;
-};
+		protected:
+			BarcodeFormat expectedFormat () const override;
+			BitArray::Range decodeMiddle (const BitArray& row, BitArray::Iterator begin, std::string& resultString) const override;
+		};
 
-} // OneD
+	} // OneD
 } // ZXing

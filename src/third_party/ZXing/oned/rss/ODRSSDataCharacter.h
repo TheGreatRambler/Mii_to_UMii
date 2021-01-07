@@ -19,39 +19,40 @@
 #include <limits>
 
 namespace ZXing {
-namespace OneD {
-namespace RSS {
+	namespace OneD {
+		namespace RSS {
 
-class DataCharacter
-{
-	int _value = std::numeric_limits<int>::max();
-	int _checksumPortion = 0;
+			class DataCharacter {
+				int _value           = std::numeric_limits<int>::max ();
+				int _checksumPortion = 0;
 
-public:
-	DataCharacter() = default;
-	DataCharacter(int value, int checksumPortion) : _value(value), _checksumPortion(checksumPortion) {}
+			public:
+				DataCharacter () = default;
+				DataCharacter (int value, int checksumPortion)
+					: _value (value)
+					, _checksumPortion (checksumPortion) {}
 
-	bool isValid() const {
-		return _value != std::numeric_limits<int>::max();
-	}
+				bool isValid () const {
+					return _value != std::numeric_limits<int>::max ();
+				}
 
-	int value() const {
-		return _value;
-	}
+				int value () const {
+					return _value;
+				}
 
-	int checksumPortion() const {
-		return _checksumPortion;
-	}
+				int checksumPortion () const {
+					return _checksumPortion;
+				}
 
-	bool operator==(const DataCharacter& other) const {
-		return _value == other._value
-			&& _checksumPortion == other._checksumPortion;
-	}
-	bool operator!=(const DataCharacter& other) const {
-		return !(*this == other);
-	}
-};
+				bool operator== (const DataCharacter& other) const {
+					return _value == other._value
+						   && _checksumPortion == other._checksumPortion;
+				}
+				bool operator!= (const DataCharacter& other) const {
+					return !(*this == other);
+				}
+			};
 
-} // RSS
-} // OneD
+		} // RSS
+	}     // OneD
 } // ZXing

@@ -18,21 +18,20 @@
 
 namespace ZXing {
 
-class DetectorResult;
-class BitMatrix;
+	class DetectorResult;
+	class BitMatrix;
 
-namespace QRCode {
+	namespace QRCode {
 
-/**
+		/**
 * <p>Encapsulates logic that can detect a QR Code in an image, even if the QR Code
 * is rotated or skewed, or partially obscured.</p>
 *
 * @author Sean Owen
 */
-class Detector
-{
-public:
-	/**
+		class Detector {
+		public:
+			/**
 	* <p>Detects a QR Code in an image.</p>
 	*
 	* @param hints optional hints to detector
@@ -40,8 +39,8 @@ public:
 	* @throws NotFoundException if QR Code cannot be found
 	* @throws FormatException if a QR Code cannot be decoded
 	*/
-	static DetectorResult Detect(const BitMatrix& image, bool tryHarder, bool isPure);
-};
+			static DetectorResult Detect (const BitMatrix& image, bool tryHarder, bool isPure);
+		};
 
-} // QRCode
+	} // QRCode
 } // ZXing

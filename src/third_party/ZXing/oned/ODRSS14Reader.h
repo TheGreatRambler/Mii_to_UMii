@@ -19,17 +19,16 @@
 #include "ODRowReader.h"
 
 namespace ZXing {
-namespace OneD {
+	namespace OneD {
 
-/**
+		/**
 * Decodes RSS-14, including truncated and stacked variants. See ISO/IEC 24724:2006.
 */
-class RSS14Reader : public RowReader
-{
-public:
-	Result decodeRow(int rowNumber, const BitArray& row, std::unique_ptr<DecodingState>& state) const override;
-	Result decodePattern(int rowNumber, const PatternView& row, std::unique_ptr<DecodingState>&) const override;
-};
+		class RSS14Reader : public RowReader {
+		public:
+			Result decodeRow (int rowNumber, const BitArray& row, std::unique_ptr<DecodingState>& state) const override;
+			Result decodePattern (int rowNumber, const PatternView& row, std::unique_ptr<DecodingState>&) const override;
+		};
 
-} // OneD
+	} // OneD
 } // ZXing

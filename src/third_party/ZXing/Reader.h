@@ -18,10 +18,10 @@
 
 namespace ZXing {
 
-class BinaryBitmap;
-class Result;
+	class BinaryBitmap;
+	class Result;
 
-/**
+	/**
 * Implementations of this interface can decode an image of a barcode in some format into
 * the string it encodes. For example, {@link com.google.zxing.qrcode.QRCodeReader} can
 * decode a QR code. The decoder may optionally receive hints from the caller which may help
@@ -35,12 +35,11 @@ class Result;
 * @author Sean Owen
 * @author dswitkin@google.com (Daniel Switkin)
 */
-class Reader
-{
-public:
-	virtual ~Reader() = default;
+	class Reader {
+	public:
+		virtual ~Reader () = default;
 
-	/**
+		/**
 	* Locates and decodes a barcode in some format within an image. This method also accepts
 	* hints, each possibly associated to some data, which may help the implementation decode.
 	*
@@ -54,7 +53,7 @@ public:
 	* @throws ChecksumException if a potential barcode is found but does not pass its checksum
 	* @throws FormatException if a potential barcode is found but format is invalid
 	*/
-	virtual Result decode(const BinaryBitmap& image) const = 0;
-};
+		virtual Result decode (const BinaryBitmap& image) const = 0;
+	};
 
 } // ZXing

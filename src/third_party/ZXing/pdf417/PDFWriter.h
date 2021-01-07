@@ -15,35 +15,40 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include <string>
 #include <memory>
+#include <string>
 
 namespace ZXing {
 
-class BitMatrix;
-enum class CharacterSet;
+	class BitMatrix;
+	enum class CharacterSet;
 
-namespace Pdf417 {
+	namespace Pdf417 {
 
-enum class Compaction;
-class Encoder;
+		enum class Compaction;
+		class Encoder;
 
-/**
+		/**
 * @author Jacob Haynes
 * @author qwandor@google.com (Andrew Walbran)
 */
-class Writer
-{
-public:
-	Writer();
-	Writer(Writer &&);
-	~Writer();
+		class Writer {
+		public:
+			Writer ();
+			Writer (Writer&&);
+			~Writer ();
 
-	Writer& setMargin(int margin) { _margin = margin; return *this; }
+			Writer& setMargin (int margin) {
+				_margin = margin;
+				return *this;
+			}
 
-	Writer& setErrorCorrectionLevel(int ecLevel) { _ecLevel = ecLevel; return *this; }
+			Writer& setErrorCorrectionLevel (int ecLevel) {
+				_ecLevel = ecLevel;
+				return *this;
+			}
 
-	/**
+			/**
 	* Sets max/min row/col values
 	*
 	* @param maxCols maximum allowed columns
@@ -51,31 +56,30 @@ public:
 	* @param maxRows maximum allowed rows
 	* @param minRows minimum allowed rows
 	*/
-	Writer& setDimensions(int minCols, int maxCols, int minRows, int maxRows);
+			Writer& setDimensions (int minCols, int maxCols, int minRows, int maxRows);
 
-	/**
+			/**
 	* @param compaction compaction mode to use
 	*/
-	Writer& setCompaction(Compaction compaction);
+			Writer& setCompaction (Compaction compaction);
 
-	/**
+			/**
 	* @param compact if true, enables compaction
 	*/
-	Writer& setCompact(bool compact);
+			Writer& setCompact (bool compact);
 
-	/**
+			/**
 	* @param encoding sets character encoding to use
 	*/
-	Writer& setEncoding(CharacterSet encoding);
+			Writer& setEncoding (CharacterSet encoding);
 
+			BitMatrix encode (const std::wstring& contents, int width, int height) const;
 
-	BitMatrix encode(const std::wstring& contents, int width, int height) const;
+		private:
+			int _margin  = -1;
+			int _ecLevel = -1;
+			std::unique_ptr<Encoder> _encoder;
+		};
 
-private:
-	int _margin = -1;
-	int _ecLevel = -1;
-	std::unique_ptr<Encoder> _encoder;
-};
-
-} // Pdf417
+	} // Pdf417
 } // ZXing

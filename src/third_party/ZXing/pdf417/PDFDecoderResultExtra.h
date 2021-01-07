@@ -22,118 +22,116 @@
 #include <vector>
 
 namespace ZXing {
-namespace Pdf417 {
+	namespace Pdf417 {
 
-/**
+		/**
 * @author Guenther Grau
 */
-class DecoderResultExtra : public CustomData
-{
-	int _segmentIndex = 0;
-	std::string _fileId;
-	std::vector<int> _optionalData;
-	bool _lastSegment = false;
-	int _segmentCount = -1;
-	std::string _sender;
-	std::string _addressee;
-	std::string _fileName;
-	int64_t _fileSize = -1;
-	int64_t _timestamp = -1;
-	int _checksum = -1;
+		class DecoderResultExtra : public CustomData {
+			int _segmentIndex = 0;
+			std::string _fileId;
+			std::vector<int> _optionalData;
+			bool _lastSegment = false;
+			int _segmentCount = -1;
+			std::string _sender;
+			std::string _addressee;
+			std::string _fileName;
+			int64_t _fileSize  = -1;
+			int64_t _timestamp = -1;
+			int _checksum      = -1;
 
-public:
+		public:
+			int segmentIndex () const {
+				return _segmentIndex;
+			}
 
-	int segmentIndex() const {
-		return _segmentIndex;
-	}
+			void setSegmentIndex (int segmentIndex) {
+				_segmentIndex = segmentIndex;
+			}
 
-	void setSegmentIndex(int segmentIndex) {
-		_segmentIndex = segmentIndex;
-	}
+			std::string fileId () const {
+				return _fileId;
+			}
 
-	std::string fileId() const {
-		return _fileId;
-	}
+			void setFileId (const std::string& fileId) {
+				_fileId = fileId;
+			}
 
-	void setFileId(const std::string& fileId) {
-		_fileId = fileId;
-	}
+			const std::vector<int>& optionalData () const {
+				return _optionalData;
+			}
 
-	const std::vector<int>& optionalData() const {
-		return _optionalData;
-	}
+			void setOptionalData (const std::vector<int>& optionalData) {
+				_optionalData = optionalData;
+			}
 
-	void setOptionalData(const std::vector<int>& optionalData) {
-		_optionalData = optionalData;
-	}
+			bool isLastSegment () const {
+				return _lastSegment;
+			}
 
-	bool isLastSegment() const {
-		return _lastSegment;
-	}
+			void setLastSegment (bool lastSegment) {
+				_lastSegment = lastSegment;
+			}
 
-	void setLastSegment(bool lastSegment) {
-		_lastSegment = lastSegment;
-	}
+			int segmentCount () const {
+				return _segmentCount;
+			}
 
-	int segmentCount() const {
-		return _segmentCount;
-	}
+			void setSegmentCount (int segmentCount) {
+				_segmentCount = segmentCount;
+			}
 
-	void setSegmentCount(int segmentCount) {
-		_segmentCount = segmentCount;
-	}
+			std::string sender () const {
+				return _sender;
+			}
 
-	std::string sender() const {
-		return _sender;
-	}
+			void setSender (const std::string& sender) {
+				_sender = sender;
+			}
 
-	void setSender(const std::string& sender) {
-		_sender = sender;
-	}
+			std::string addressee () const {
+				return _addressee;
+			}
 
-	std::string addressee() const {
-		return _addressee;
-	}
+			void setAddressee (const std::string& addressee) {
+				_addressee = addressee;
+			}
 
-	void setAddressee(const std::string& addressee) {
-		_addressee = addressee;
-	}
+			std::string fileName () const {
+				return _fileName;
+			}
 
-	std::string fileName() const {
-		return _fileName;
-	}
+			void setFileName (const std::string& fileName) {
+				_fileName = fileName;
+			}
 
-	void setFileName(const std::string& fileName) {
-		_fileName = fileName;
-	}
+			// -1 if not set
+			int64_t fileSize () const {
+				return _fileSize;
+			}
 
-	// -1 if not set
-	int64_t fileSize() const {
-		return _fileSize;
-	}
+			void setFileSize (int64_t fileSize) {
+				_fileSize = fileSize;
+			}
 
-	void setFileSize(int64_t fileSize) {
-		_fileSize = fileSize;
-	}
+			// 16-bit CRC checksum using CCITT-16, -1 if not set
+			int checksum () const {
+				return _checksum;
+			}
 
-	 // 16-bit CRC checksum using CCITT-16, -1 if not set
-	int checksum() const {
-		return _checksum;
-	}
+			void setChecksum (int checksum) {
+				_checksum = checksum;
+			}
 
-	void setChecksum(int checksum) {
-		_checksum = checksum;
-	}
+			// Unix epock timestamp, elapsed seconds since 1970-01-01, -1 if not set
+			int64_t timestamp () const {
+				return _timestamp;
+			}
 
-	// Unix epock timestamp, elapsed seconds since 1970-01-01, -1 if not set
-	int64_t timestamp() const {
-		return _timestamp;
-	}
+			void setTimestamp (int64_t timestamp) {
+				_timestamp = timestamp;
+			}
+		};
 
-	void setTimestamp(int64_t timestamp) {
-		_timestamp = timestamp;
-	}
-};
-
-} // Pdf417
+	} // Pdf417
 } // ZXing

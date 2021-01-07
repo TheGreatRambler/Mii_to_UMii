@@ -18,9 +18,9 @@
 
 namespace ZXing {
 
-class ByteArray;
+	class ByteArray;
 
-/**
+	/**
 * <p>This provides an easy abstraction to read bits at a time from a sequence of bytes, where the
 * number of bits read is not often a multiple of 8.</p>
 *
@@ -29,49 +29,49 @@ class ByteArray;
 *
 * @author Sean Owen
 */
-class BitSource
-{
-	const ByteArray& _bytes;
-	int _byteOffset = 0;
-	int _bitOffset = 0;
+	class BitSource {
+		const ByteArray& _bytes;
+		int _byteOffset = 0;
+		int _bitOffset  = 0;
 
-public:
-	/**
+	public:
+		/**
 	* @param bytes bytes from which this will read bits. Bits will be read from the first byte first.
 	* Bits are read within a byte from most-significant to least-significant bit.
 	* IMPORTANT: Bit source DOES NOT copy data byte, thus make sure that the bytes outlive the bit source object.
 	*/
-	explicit BitSource(const ByteArray& bytes) : _bytes(bytes) {}
-	
-	BitSource(BitSource &) = delete;
-	BitSource& operator=(const BitSource &) = delete;
+		explicit BitSource (const ByteArray& bytes)
+			: _bytes (bytes) {}
 
-	/**
+		BitSource (BitSource&) = delete;
+		BitSource& operator= (const BitSource&) = delete;
+
+		/**
 	* @return index of next bit in current byte which would be read by the next call to {@link #readBits(int)}.
 	*/
-	int bitOffset() const {
-		return _bitOffset;
-	}
+		int bitOffset () const {
+			return _bitOffset;
+		}
 
-	/**
+		/**
 	* @return index of next byte in input byte array which would be read by the next call to {@link #readBits(int)}.
 	*/
-	int byteOffset() const {
-		return _byteOffset;
-	}
+		int byteOffset () const {
+			return _byteOffset;
+		}
 
-	/**
+		/**
 	* @param numBits number of bits to read
 	* @return int representing the bits read. The bits will appear as the least-significant
 	*         bits of the int
 	* @throws IllegalArgumentException if numBits isn't in [1,32] or more than is available
 	*/
-	int readBits(int numBits);
+		int readBits (int numBits);
 
-	/**
+		/**
 	* @return number of bits that can be read successfully
 	*/
-	int available() const;
-};
+		int available () const;
+	};
 
 } // ZXing

@@ -34,9 +34,8 @@
 
 #include <string>
 
-class GBTextEncoder
-{
+class GBTextEncoder {
 public:
-	static void EncodeGB18030(const std::wstring& str, std::string& bytes);
-	static void EncodeGB2312(const std::wstring& str, std::string& bytes);
+	static void EncodeGB18030 (const std::wstring& str, std::string& bytes);
+	static void EncodeGB2312 (const std::wstring& str, std::string& bytes);
 };

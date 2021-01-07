@@ -18,33 +18,32 @@
 
 namespace ZXing {
 
-enum class CharacterSet;
+	enum class CharacterSet;
 
-/**
+	/**
 * Encapsulates a Character Set ECI, according to "Extended Channel Interpretations" 5.3.1.1
 * of ISO 18004.
 *
 * @author Sean Owen
 */
-class CharacterSetECI
-{
-public:
-	/**
+	class CharacterSetECI {
+	public:
+		/**
 	* @param value character set ECI value
 	* @return {@code CharacterSetECI} representing ECI of given value, or null if it is legal but
 	*   unsupported
 	* @throws FormatException if ECI value is invalid
 	*/
-	static CharacterSet CharsetFromValue(int value);
+		static CharacterSet CharsetFromValue (int value);
 
-	static int ValueForCharset(CharacterSet charset);
+		static int ValueForCharset (CharacterSet charset);
 
-	/**
+		/**
 	* @param name character set ECI encoding name
 	* @return CharacterSetECI representing ECI for character encoding, or null if it is legal
 	*   but unsupported
 	*/
-	static CharacterSet CharsetFromName(const char* name);
-};
+		static CharacterSet CharsetFromName (const char* name);
+	};
 
 } // ZXing

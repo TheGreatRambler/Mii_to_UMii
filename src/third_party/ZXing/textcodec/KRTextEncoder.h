@@ -34,8 +34,7 @@
 
 #include <string>
 
-class KRTextDecoder
-{
+class KRTextDecoder {
 public:
-	static void EncodeEucKr(const std::wstring& str, std::string& bytes);
+	static void EncodeEucKr (const std::wstring& str, std::string& bytes);
 };

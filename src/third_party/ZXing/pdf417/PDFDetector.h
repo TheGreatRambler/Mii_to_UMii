@@ -19,19 +19,19 @@
 #include "ResultPoint.h"
 #include "ZXNullable.h"
 
-#include <list>
 #include <array>
+#include <list>
 #include <memory>
 
 namespace ZXing {
 
-class BitMatrix;
-class BinaryBitmap;
-enum class DecodeStatus;
+	class BitMatrix;
+	class BinaryBitmap;
+	enum class DecodeStatus;
 
-namespace Pdf417 {
+	namespace Pdf417 {
 
-/**
+		/**
 * <p>Encapsulates logic that can detect a PDF417 Code in an image, even if the
 * PDF417 Code is rotated or skewed, or partially obscured.< / p>
 *
@@ -39,17 +39,15 @@ namespace Pdf417 {
 * @author dswitkin@google.com(Daniel Switkin)
 * @author Guenther Grau
 */
-class Detector
-{
-public:
-	struct Result
-	{
-		std::shared_ptr<const BitMatrix> bits;
-		std::list<std::array<Nullable<ResultPoint>, 8>> points;
-	};
+		class Detector {
+		public:
+			struct Result {
+				std::shared_ptr<const BitMatrix> bits;
+				std::list<std::array<Nullable<ResultPoint>, 8>> points;
+			};
 
-	static DecodeStatus Detect(const BinaryBitmap& image, bool multiple, Result& result);
-};
+			static DecodeStatus Detect (const BinaryBitmap& image, bool multiple, Result& result);
+		};
 
-} // Pdf417
+	} // Pdf417
 } // ZXing

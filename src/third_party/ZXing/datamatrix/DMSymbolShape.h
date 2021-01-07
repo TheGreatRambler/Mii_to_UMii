@@ -17,13 +17,13 @@
 */
 
 namespace ZXing {
-namespace DataMatrix {
+	namespace DataMatrix {
 
-enum class SymbolShape {
-	NONE,
-	SQUARE,
-	RECTANGLE,
-};
+		enum class SymbolShape {
+			NONE,
+			SQUARE,
+			RECTANGLE,
+		};
 
-} // DataMatrix
+	} // DataMatrix
 } // ZXing

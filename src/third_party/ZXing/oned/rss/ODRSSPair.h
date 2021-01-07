@@ -20,35 +20,37 @@
 #include "ODRSSFinderPattern.h"
 
 namespace ZXing {
-namespace OneD {
-namespace RSS {
+	namespace OneD {
+		namespace RSS {
 
-class Pair : public DataCharacter
-{
-	FinderPattern _finderPattern;
-	int _count = 0;
+			class Pair : public DataCharacter {
+				FinderPattern _finderPattern;
+				int _count = 0;
 
-public:
-	Pair() = default;
-	Pair(int value, int checksumPortion, const FinderPattern& finderPattern) : DataCharacter(value, checksumPortion), _finderPattern(finderPattern), _count(1) {}
+			public:
+				Pair () = default;
+				Pair (int value, int checksumPortion, const FinderPattern& finderPattern)
+					: DataCharacter (value, checksumPortion)
+					, _finderPattern (finderPattern)
+					, _count (1) {}
 
-	const FinderPattern& finderPattern() const {
-		return _finderPattern;
-	}
+				const FinderPattern& finderPattern () const {
+					return _finderPattern;
+				}
 
-	int count() const {
-		return _count;
-	}
+				int count () const {
+					return _count;
+				}
 
-	void incrementCount() {
-		_count++;
-	}
+				void incrementCount () {
+					_count++;
+				}
 
-	bool operator==(const Pair& other) const {
-		return DataCharacter::operator==(other) && other.finderPattern().value() == finderPattern().value();
-	}
-};
+				bool operator== (const Pair& other) const {
+					return DataCharacter::operator== (other) && other.finderPattern ().value () == finderPattern ().value ();
+				}
+			};
 
-} // RSS
-} // OneD
+		} // RSS
+	}     // OneD
 } // ZXing

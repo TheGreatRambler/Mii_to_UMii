@@ -18,11 +18,11 @@
 
 namespace ZXing {
 
-class BitMatrix;
+	class BitMatrix;
 
-namespace QRCode {
+	namespace QRCode {
 
-/**
+		/**
 * <p>Encapsulates data masks for the data bits in a QR code, per ISO 18004:2006 6.8. Implementations
 * of this class can un-mask a raw BitMatrix. For simplicity, they will unmask the entire BitMatrix,
 * including areas used for finder patterns, timing patterns, etc. These areas should be unused
@@ -33,28 +33,27 @@ namespace QRCode {
 *
 * @author Sean Owen
 */
-class DataMask
-{
-public:
-	/**
+		class DataMask {
+		public:
+			/**
 	* @param reference a value between 0 and 7 indicating one of the eight possible
 	* data mask patterns a QR Code may use
 	* @return DataMask encapsulating the data mask pattern
 	*/
-	explicit DataMask(int reference);
+			explicit DataMask (int reference);
 
-	/**
+			/**
 	* <p>Implementations of this method reverse the data masking process applied to a QR Code and
 	* make its bits ready to read.</p>
 	*
 	* @param bits representation of QR Code bits
 	* @param dimension dimension of QR Code, represented by bits, being unmasked
 	*/
-	void unmaskBitMatrix(BitMatrix& bits, int dimension) const;
+			void unmaskBitMatrix (BitMatrix& bits, int dimension) const;
 
-private:
-	bool(*_isMasked)(int, int);
-};
+		private:
+			bool (*_isMasked) (int, int);
+		};
 
-} // QRCode
+	} // QRCode
 } // ZXing

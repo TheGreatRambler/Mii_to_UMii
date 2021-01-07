@@ -19,30 +19,31 @@
 
 namespace ZXing {
 
-class BitArray;
+	class BitArray;
 
-namespace Aztec {
+	namespace Aztec {
 
-class Token
-{
-public:
-	void appendTo(BitArray& bitArray, const std::string& text) const;
+		class Token {
+		public:
+			void appendTo (BitArray& bitArray, const std::string& text) const;
 
-	static Token CreateSimple(int value, int bitCount) {
-		return {value, -bitCount};
-	}
-	
-	static Token CreateBinaryShift(int start, int byteCount) {
-		return {start, byteCount};
-	}
+			static Token CreateSimple (int value, int bitCount) {
+				return { value, -bitCount };
+			}
 
-private:
-	short _value;
-	short _count;	// is simple token if negative, 
-	
-public:
-	Token(int value, int count) : _value((short)value), _count((short)count) {}
-};
+			static Token CreateBinaryShift (int start, int byteCount) {
+				return { start, byteCount };
+			}
 
-} // Aztec
+		private:
+			short _value;
+			short _count; // is simple token if negative,
+
+		public:
+			Token (int value, int count)
+				: _value ((short)value)
+				, _count ((short)count) {}
+		};
+
+	} // Aztec
 } // ZXing

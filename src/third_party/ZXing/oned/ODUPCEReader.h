@@ -19,26 +19,26 @@
 #include "ODUPCEANReader.h"
 
 namespace ZXing {
-namespace OneD {
+	namespace OneD {
 
-/**
+		/**
 * <p>Implements decoding of the UPC-E format.</p>
 * <p><a href="http://www.barcodeisland.com/upce.phtml">This</a> is a great reference for
 * UPC-E information.</p>
 *
 * @author Sean Owen
 */
-class UPCEReader : public UPCEANReader
-{
-public:
-	explicit UPCEReader(const DecodeHints& hints) : UPCEANReader(hints) {}
+		class UPCEReader : public UPCEANReader {
+		public:
+			explicit UPCEReader (const DecodeHints& hints)
+				: UPCEANReader (hints) {}
 
-protected:
-	BarcodeFormat expectedFormat() const override;
-	BitArray::Range decodeMiddle(const BitArray& row, BitArray::Iterator, std::string& resultString) const override;
-	bool checkChecksum(const std::string& s) const override;
-	BitArray::Range decodeEnd(const BitArray& row, BitArray::Iterator begin) const override;
-};
+		protected:
+			BarcodeFormat expectedFormat () const override;
+			BitArray::Range decodeMiddle (const BitArray& row, BitArray::Iterator, std::string& resultString) const override;
+			bool checkChecksum (const std::string& s) const override;
+			BitArray::Range decodeEnd (const BitArray& row, BitArray::Iterator begin) const override;
+		};
 
-} // OneD
+	} // OneD
 } // ZXing

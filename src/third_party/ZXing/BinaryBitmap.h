@@ -24,37 +24,37 @@
 
 namespace ZXing {
 
-class BitArray;
-class BitMatrix;
+	class BitArray;
+	class BitMatrix;
 
-/**
+	/**
 * This class is the core bitmap class used by ZXing to represent 1 bit data. Reader objects
 * accept a BinaryBitmap and attempt to decode it.
 *
 * @author dswitkin@google.com (Daniel Switkin)
 */
-class BinaryBitmap
-{
-public:
-	virtual ~BinaryBitmap() = default;
+	class BinaryBitmap {
+	public:
+		virtual ~BinaryBitmap () = default;
 
-	/**
+		/**
 	* Image is a pure monochrome image of a barcode.
 	*/
-	[[deprecated]]
-	virtual bool isPureBarcode() const { return false; }
+		[[deprecated]] virtual bool isPureBarcode () const {
+			return false;
+		}
 
-	/**
+		/**
 	* @return The width of the bitmap.
 	*/
-	virtual int width() const = 0;
+		virtual int width () const = 0;
 
-	/**
+		/**
 	* @return The height of the bitmap.
 	*/
-	virtual int height() const = 0;
+		virtual int height () const = 0;
 
-	/**
+		/**
 	* Converts one row of luminance data to 1 bit data.
 	* This method is intended for decoding 1D barcodes and may choose to apply sharpening.
 	*
@@ -64,28 +64,27 @@ public:
 	* @return The array of bits for this row (true means black).
 	* @throws NotFoundException if row can't be binarized
 	*/
-	virtual bool getBlackRow(int y, BitArray& outArray) const = 0;
+		virtual bool getBlackRow (int y, BitArray& outArray) const = 0;
 
-	virtual bool getPatternRow(int y, PatternRow& res) const
-	{
-		res.clear();
-		BitArray row;
-		getBlackRow(y, row);
+		virtual bool getPatternRow (int y, PatternRow& res) const {
+			res.clear ();
+			BitArray row;
+			getBlackRow (y, row);
 
-		auto li = row.begin();
-		auto i = li;
-		if (*i)
-			res.push_back(0);
-		while ((i = row.getNextSetTo(i, !*i)) != row.end()) {
-			res.push_back(static_cast<PatternRow::value_type>(i - li));
-			li = i;
+			auto li = row.begin ();
+			auto i  = li;
+			if (*i)
+				res.push_back (0);
+			while ((i = row.getNextSetTo (i, !*i)) != row.end ()) {
+				res.push_back (static_cast<PatternRow::value_type> (i - li));
+				li = i;
+			}
+			res.push_back (static_cast<PatternRow::value_type> (i - li));
+
+			return true;
 		}
-		res.push_back(static_cast<PatternRow::value_type>(i - li));
 
-		return true;
-	}
-
-	/**
+		/**
 	* Converts a 2D array of luminance data to 1 bit. This method is intended for decoding 2D
 	* barcodes and may or may not apply sharpening. Therefore, a row from this matrix may not be
 	* identical to one fetched using getBlackRow(), so don't mix and match between them.
@@ -93,14 +92,16 @@ public:
 	* @return The 2D array of bits for the image (true means black).
 	* @return null if image can't be binarized to make a matrix
 	*/
-	virtual std::shared_ptr<const BitMatrix> getBlackMatrix() const = 0;
+		virtual std::shared_ptr<const BitMatrix> getBlackMatrix () const = 0;
 
-	/**
+		/**
 	* @return Whether this bitmap can be cropped.
 	*/
-	virtual bool canCrop() const { return false; }
+		virtual bool canCrop () const {
+			return false;
+		}
 
-	/**
+		/**
 	* Returns a new object with cropped image data. Implementations may keep a reference to the
 	* original data rather than a copy. Only callable if isCropSupported() is true.
 	*
@@ -110,27 +111,27 @@ public:
 	* @param height The height of the rectangle to crop.
 	* @return A cropped version of this object.
 	*/
-	virtual std::shared_ptr<BinaryBitmap> cropped(int /*left*/, int /*top*/, int /*width*/, int /*height*/) const
-	{
-		throw std::runtime_error("This binarizer does not support cropping.");
-	}
+		virtual std::shared_ptr<BinaryBitmap> cropped (int /*left*/, int /*top*/, int /*width*/, int /*height*/) const {
+			throw std::runtime_error ("This binarizer does not support cropping.");
+		}
 
-	/**
+		/**
 	* @return Whether this bitmap supports counter-clockwise rotation.
 	*/
-	virtual bool canRotate() const { return false; }
+		virtual bool canRotate () const {
+			return false;
+		}
 
-	/**
+		/**
 	* Returns a new object with rotated image data by 90 degrees clockwise.
 	* Only callable if {@link #isRotateSupported()} is true.
 	*
 	* @param degreeCW degree in clockwise direction, possible values are 90, 180 and 270
 	* @return A rotated version of this object.
 	*/
-	virtual std::shared_ptr<BinaryBitmap> rotated(int /*degreeCW*/) const
-	{
-		throw std::runtime_error("This binarizer does not support rotation.");
-	}
-};
+		virtual std::shared_ptr<BinaryBitmap> rotated (int /*degreeCW*/) const {
+			throw std::runtime_error ("This binarizer does not support rotation.");
+		}
+	};
 
 } // ZXing

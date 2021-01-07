@@ -17,27 +17,26 @@
 */
 namespace ZXing {
 
-class ByteArray;
+	class ByteArray;
 
-namespace DataMatrix {
+	namespace DataMatrix {
 
-class SymbolInfo;
+		class SymbolInfo;
 
-/**
+		/**
 * Error Correction Code for ECC200.
 */
-class ECEncoder
-{
-public:
-	/**
+		class ECEncoder {
+		public:
+			/**
 	* Creates the ECC200 error correction for an encoded message.
 	*
 	* @param codewords  the codewords
 	* @param symbolInfo information about the symbol to be encoded
 	* @return the codewords with interleaved error correction.
 	*/
-	static void EncodeECC200(ByteArray& codewords, const SymbolInfo& symbolInfo);
-};
+			static void EncodeECC200 (ByteArray& codewords, const SymbolInfo& symbolInfo);
+		};
 
-} // DataMatrix
+	} // DataMatrix
 } // ZXing

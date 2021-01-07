@@ -15,39 +15,37 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#include <string>
 #include "BitMatrix.h"
+#include <string>
 
 namespace ZXing {
-namespace Aztec {
+	namespace Aztec {
 
-/**
+		/**
 * Aztec 2D code representation
 *
 * @author Rustam Abdullaev
 */
-struct EncodeResult
-{
-	bool compact;
-	int size;
-	int layers;
-	int codeWords;
-	BitMatrix matrix;
-};
+		struct EncodeResult {
+			bool compact;
+			int size;
+			int layers;
+			int codeWords;
+			BitMatrix matrix;
+		};
 
-/**
+		/**
 * Generates Aztec 2D barcodes.
 *
 * @author Rustam Abdullaev
 */
-class Encoder
-{
-public:
-	static const int DEFAULT_EC_PERCENT = 33; // default minimal percentage of error check words
-	static const int DEFAULT_AZTEC_LAYERS = 0;
+		class Encoder {
+		public:
+			static const int DEFAULT_EC_PERCENT   = 33; // default minimal percentage of error check words
+			static const int DEFAULT_AZTEC_LAYERS = 0;
 
-	static EncodeResult Encode(const std::string& data, int minECCPercent, int userSpecifiedLayers);
-};
+			static EncodeResult Encode (const std::string& data, int minECCPercent, int userSpecifiedLayers);
+		};
 
-} // Aztec
+	} // Aztec
 } // ZXing

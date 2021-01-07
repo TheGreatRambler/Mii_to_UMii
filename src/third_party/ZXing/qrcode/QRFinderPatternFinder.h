@@ -21,24 +21,23 @@
 
 namespace ZXing {
 
-class BitMatrix;
+	class BitMatrix;
 
-namespace QRCode {
+	namespace QRCode {
 
-class FinderPattern;
-class FinderPatternInfo;
+		class FinderPattern;
+		class FinderPatternInfo;
 
-/**
+		/**
 * <p>This class attempts to find finder patterns in a QR Code. Finder patterns are the square
 * markers at three corners of a QR Code.</p>
 *
 * @author Sean Owen
 */
-class FinderPatternFinder
-{
-public:
-	static FinderPatternInfo Find(const BitMatrix& image, bool tryHarder);
-};
+		class FinderPatternFinder {
+		public:
+			static FinderPatternInfo Find (const BitMatrix& image, bool tryHarder);
+		};
 
-} // QRCode
+	} // QRCode
 } // ZXing

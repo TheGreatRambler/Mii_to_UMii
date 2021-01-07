@@ -19,32 +19,31 @@
 #include <vector>
 
 namespace ZXing {
-namespace Aztec {
+	namespace Aztec {
 
-class Token;
+		class Token;
 
-/**
+		/**
 * State represents all information about a sequence necessary to generate the current output.
 * Note that a state is immutable.
 */
-class EncodingState
-{
-public:
-	// The list of tokens that we output.  If we are in Binary Shift mode, this
-	// token list does *not* yet included the token for those bytes
-	std::vector<Token> tokens;
+		class EncodingState {
+		public:
+			// The list of tokens that we output.  If we are in Binary Shift mode, this
+			// token list does *not* yet included the token for those bytes
+			std::vector<Token> tokens;
 
-	// The current mode of the encoding (or the mode to which we'll return if
-	// we're in Binary Shift mode.
-	int mode;
-	
-	// If non-zero, the number of most recent bytes that should be output
-	// in Binary Shift mode.
-	int binaryShiftByteCount;
-	
-	// The total number of bits generated (including Binary Shift).
-	int bitCount;
-};
+			// The current mode of the encoding (or the mode to which we'll return if
+			// we're in Binary Shift mode.
+			int mode;
 
-} // Aztec
+			// If non-zero, the number of most recent bytes that should be output
+			// in Binary Shift mode.
+			int binaryShiftByteCount;
+
+			// The total number of bits generated (including Binary Shift).
+			int bitCount;
+		};
+
+	} // Aztec
 } // ZXing
