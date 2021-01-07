@@ -18,10 +18,10 @@
 
 namespace ZXing {
 
-class BitMatrix;
-class ResultPoint;
+	class BitMatrix;
+	class ResultPoint;
 
-/**
+	/**
 * <p>
 * Detects a candidate barcode-like rectangular region within an image. It
 * starts around the center of the image, increases the size of the candidate
@@ -31,10 +31,9 @@ class ResultPoint;
 *
 * @author David Olivier
 */
-class WhiteRectDetector
-{
-public:
-	/**
+	class WhiteRectDetector {
+	public:
+		/**
 	* <p>
 	* Detects a candidate barcode-like rectangular region within an image. It
 	* starts around the center of the image, increases the size of the candidate
@@ -52,8 +51,8 @@ public:
 	*         leftmost and the third, the rightmost
 	* @throws NotFoundException if no Data Matrix Code can be found
 	*/
-	static bool Detect(const BitMatrix& image, int initSize, int x, int y, ResultPoint& p0, ResultPoint& p1, ResultPoint& p2, ResultPoint& p3);
-	static bool Detect(const BitMatrix& image, ResultPoint& p0, ResultPoint& p1, ResultPoint& p2, ResultPoint& p3);
-};
+		static bool Detect (const BitMatrix& image, int initSize, int x, int y, ResultPoint& p0, ResultPoint& p1, ResultPoint& p2, ResultPoint& p3);
+		static bool Detect (const BitMatrix& image, ResultPoint& p0, ResultPoint& p1, ResultPoint& p2, ResultPoint& p3);
+	};
 
 } // ZXing

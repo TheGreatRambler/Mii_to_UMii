@@ -22,9 +22,9 @@
 
 namespace ZXing {
 
-class LuminanceSource;
+	class LuminanceSource;
 
-/**
+	/**
 * This Binarizer implementation uses the old ZXing global histogram approach. It is suitable
 * for low-end mobile devices which don't have enough CPU or memory to use a local thresholding
 * algorithm. However, because it picks a global black point, it cannot handle difficult shadows
@@ -35,30 +35,29 @@ class LuminanceSource;
 * @author dswitkin@google.com (Daniel Switkin)
 * @author Sean Owen
 */
-class GlobalHistogramBinarizer : public BinaryBitmap
-{
-protected:
-	std::shared_ptr<const LuminanceSource> _source;
+	class GlobalHistogramBinarizer : public BinaryBitmap {
+	protected:
+		std::shared_ptr<const LuminanceSource> _source;
 
-public:
-	explicit GlobalHistogramBinarizer(std::shared_ptr<const LuminanceSource> source);
-	~GlobalHistogramBinarizer() override;
+	public:
+		explicit GlobalHistogramBinarizer (std::shared_ptr<const LuminanceSource> source);
+		~GlobalHistogramBinarizer () override;
 
-	int width() const override;
-	int height() const override;
-	bool getBlackRow(int y, BitArray& row) const override;
-	bool getPatternRow(int y, PatternRow &res) const override;
-	std::shared_ptr<const BitMatrix> getBlackMatrix() const override;
-	bool canCrop() const override;
-	std::shared_ptr<BinaryBitmap> cropped(int left, int top, int width, int height) const override;
-	bool canRotate() const override;
-	std::shared_ptr<BinaryBitmap> rotated(int degreeCW) const override;
+		int width () const override;
+		int height () const override;
+		bool getBlackRow (int y, BitArray& row) const override;
+		bool getPatternRow (int y, PatternRow& res) const override;
+		std::shared_ptr<const BitMatrix> getBlackMatrix () const override;
+		bool canCrop () const override;
+		std::shared_ptr<BinaryBitmap> cropped (int left, int top, int width, int height) const override;
+		bool canRotate () const override;
+		std::shared_ptr<BinaryBitmap> rotated (int degreeCW) const override;
 
-	virtual std::shared_ptr<BinaryBitmap> newInstance(const std::shared_ptr<const LuminanceSource>& source) const;
+		virtual std::shared_ptr<BinaryBitmap> newInstance (const std::shared_ptr<const LuminanceSource>& source) const;
 
-private:
-	struct DataCache;
-	std::unique_ptr<DataCache> _cache;
-};
+	private:
+		struct DataCache;
+		std::unique_ptr<DataCache> _cache;
+	};
 
 } // ZXing

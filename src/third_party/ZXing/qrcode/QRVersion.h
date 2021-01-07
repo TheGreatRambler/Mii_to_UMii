@@ -25,62 +25,61 @@
 
 namespace ZXing {
 
-class BitMatrix;
+	class BitMatrix;
 
-namespace QRCode {
+	namespace QRCode {
 
-/**
+		/**
 * See ISO 18004:2006 Annex D
 *
 * @author Sean Owen
 */
-class Version
-{
-public:
-	int versionNumber() const {
-		return _versionNumber;
-	}
+		class Version {
+		public:
+			int versionNumber () const {
+				return _versionNumber;
+			}
 
-	const std::vector<int>& alignmentPatternCenters() const {
-		return _alignmentPatternCenters;
-	}
-	
-	int totalCodewords() const {
-		return _totalCodewords;
-	}
-	
-	int dimensionForVersion() const {
-		return 17 + 4 * _versionNumber;
-	}
-	
-	const ECBlocks & ecBlocksForLevel(ErrorCorrectionLevel ecLevel) const {
-		return _ecBlocks[(int)ecLevel];
-	}
+			const std::vector<int>& alignmentPatternCenters () const {
+				return _alignmentPatternCenters;
+			}
 
-	void buildFunctionPattern(BitMatrix& bitMatrix) const;
-	
-	/**
+			int totalCodewords () const {
+				return _totalCodewords;
+			}
+
+			int dimensionForVersion () const {
+				return 17 + 4 * _versionNumber;
+			}
+
+			const ECBlocks& ecBlocksForLevel (ErrorCorrectionLevel ecLevel) const {
+				return _ecBlocks[(int)ecLevel];
+			}
+
+			void buildFunctionPattern (BitMatrix& bitMatrix) const;
+
+			/**
 	* <p>Deduces version information purely from QR Code dimensions.</p>
 	*
 	* @param dimension dimension in modules
 	* @return Version for a QR Code of that dimension
 	* @throws FormatException if dimension is not 1 mod 4
 	*/
-	static const Version* ProvisionalVersionForDimension(int dimension);
-	
-	static const Version* VersionForNumber(int versionNumber);
+			static const Version* ProvisionalVersionForDimension (int dimension);
 
-	static const Version* DecodeVersionInformation(int versionBits);
-	
-private:
-	int _versionNumber;
-	std::vector<int> _alignmentPatternCenters;
-	std::array<ECBlocks, 4> _ecBlocks;
-	int _totalCodewords;
+			static const Version* VersionForNumber (int versionNumber);
 
-	Version(int versionNumber, std::initializer_list<int> alignmentPatternCenters, const std::array<ECBlocks, 4> &ecBlocks);
-	static const Version* AllVersions();
-};
+			static const Version* DecodeVersionInformation (int versionBits);
 
-} // QRCode
+		private:
+			int _versionNumber;
+			std::vector<int> _alignmentPatternCenters;
+			std::array<ECBlocks, 4> _ecBlocks;
+			int _totalCodewords;
+
+			Version (int versionNumber, std::initializer_list<int> alignmentPatternCenters, const std::array<ECBlocks, 4>& ecBlocks);
+			static const Version* AllVersions ();
+		};
+
+	} // QRCode
 } // ZXing

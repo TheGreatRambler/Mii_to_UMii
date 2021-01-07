@@ -22,7 +22,7 @@
 
 namespace ZXing {
 
-/**
+	/**
 * This class implements a local thresholding algorithm, which while slower than the
 * GlobalHistogramBinarizer, is fairly efficient for what it does. It is designed for
 * high frequency images of barcodes with black data on white backgrounds. For this application,
@@ -39,18 +39,17 @@ namespace ZXing {
 *
 * @author dswitkin@google.com (Daniel Switkin)
 */
-class HybridBinarizer : public GlobalHistogramBinarizer
-{
-public:
-	explicit HybridBinarizer(const std::shared_ptr<const LuminanceSource>& source);
-	~HybridBinarizer() override;
+	class HybridBinarizer : public GlobalHistogramBinarizer {
+	public:
+		explicit HybridBinarizer (const std::shared_ptr<const LuminanceSource>& source);
+		~HybridBinarizer () override;
 
-	std::shared_ptr<const BitMatrix> getBlackMatrix() const override;
-	std::shared_ptr<BinaryBitmap> newInstance(const std::shared_ptr<const LuminanceSource>& source) const override;
+		std::shared_ptr<const BitMatrix> getBlackMatrix () const override;
+		std::shared_ptr<BinaryBitmap> newInstance (const std::shared_ptr<const LuminanceSource>& source) const override;
 
-private:
-	struct DataCache;
-	std::unique_ptr<DataCache> _cache;
-};
+	private:
+		struct DataCache;
+		std::unique_ptr<DataCache> _cache;
+	};
 
 } // ZXing

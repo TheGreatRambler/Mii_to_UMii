@@ -23,71 +23,70 @@
 #include <vector>
 
 namespace ZXing {
-namespace Pdf417 {
+	namespace Pdf417 {
 
-class BarcodeMetadata;
+		class BarcodeMetadata;
 
-/**
+		/**
 * @author Guenther Grau
 */
-class DetectionResultColumn
-{
-public:
-	enum class RowIndicator {
-		None,
-		Left,
-		Right,
-	};
+		class DetectionResultColumn {
+		public:
+			enum class RowIndicator {
+				None,
+				Left,
+				Right,
+			};
 
-	DetectionResultColumn() {}
-	explicit DetectionResultColumn(const BoundingBox& boundingBox, RowIndicator rowInd = RowIndicator::None);
+			DetectionResultColumn () {}
+			explicit DetectionResultColumn (const BoundingBox& boundingBox, RowIndicator rowInd = RowIndicator::None);
 
-	bool isRowIndicator() const {
-		return _rowIndicator != RowIndicator::None;
-	}
+			bool isRowIndicator () const {
+				return _rowIndicator != RowIndicator::None;
+			}
 
-	bool isLeftRowIndicator() const {
-		return _rowIndicator == RowIndicator::Left;
-	}
+			bool isLeftRowIndicator () const {
+				return _rowIndicator == RowIndicator::Left;
+			}
 
-	Nullable<Codeword> codewordNearby(int imageRow) const;
+			Nullable<Codeword> codewordNearby (int imageRow) const;
 
-	int imageRowToCodewordIndex(int imageRow) const {
-		return imageRow - _boundingBox.minY();
-	}
+			int imageRowToCodewordIndex (int imageRow) const {
+				return imageRow - _boundingBox.minY ();
+			}
 
-	void setCodeword(int imageRow, Codeword codeword) {
-		_codewords[imageRowToCodewordIndex(imageRow)] = codeword;
-	}
+			void setCodeword (int imageRow, Codeword codeword) {
+				_codewords[imageRowToCodewordIndex (imageRow)] = codeword;
+			}
 
-	Nullable<Codeword> codeword(int imageRow) const {
-		return _codewords[imageRowToCodewordIndex(imageRow)];
-	}
+			Nullable<Codeword> codeword (int imageRow) const {
+				return _codewords[imageRowToCodewordIndex (imageRow)];
+			}
 
-	const BoundingBox& boundingBox() const {
-		return _boundingBox;
-	}
+			const BoundingBox& boundingBox () const {
+				return _boundingBox;
+			}
 
-	const std::vector<Nullable<Codeword>>& allCodewords() const {
-		return _codewords;
-	}
+			const std::vector<Nullable<Codeword>>& allCodewords () const {
+				return _codewords;
+			}
 
-	std::vector<Nullable<Codeword>>& allCodewords() {
-		return _codewords;
-	}
+			std::vector<Nullable<Codeword>>& allCodewords () {
+				return _codewords;
+			}
 
-	void adjustCompleteIndicatorColumnRowNumbers(const BarcodeMetadata& barcodeMetadata);
-	bool getRowHeights(std::vector<int>& result); // not const, since it modifies object's state
-	bool getBarcodeMetadata(BarcodeMetadata& result); // not const, since it modifies object's state
+			void adjustCompleteIndicatorColumnRowNumbers (const BarcodeMetadata& barcodeMetadata);
+			bool getRowHeights (std::vector<int>& result);     // not const, since it modifies object's state
+			bool getBarcodeMetadata (BarcodeMetadata& result); // not const, since it modifies object's state
 
-private:
-	BoundingBox _boundingBox;
-	std::vector<Nullable<Codeword>> _codewords;
-	RowIndicator _rowIndicator = RowIndicator::None;
+		private:
+			BoundingBox _boundingBox;
+			std::vector<Nullable<Codeword>> _codewords;
+			RowIndicator _rowIndicator = RowIndicator::None;
 
-	void setRowNumbers();
-	void adjustIncompleteIndicatorColumnRowNumbers(const BarcodeMetadata& barcodeMetadata);
-};
+			void setRowNumbers ();
+			void adjustIncompleteIndicatorColumnRowNumbers (const BarcodeMetadata& barcodeMetadata);
+		};
 
-} // Pdf417
+	} // Pdf417
 } // ZXing

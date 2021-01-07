@@ -21,42 +21,44 @@
 #include <array>
 
 namespace ZXing {
-namespace OneD {
-namespace RSS {
+	namespace OneD {
+		namespace RSS {
 
-class FinderPattern
-{
-	int _value = -1;
-	int _start = -1;
-	int _end = -1;
-	std::array<ResultPoint, 2> _points;
+			class FinderPattern {
+				int _value = -1;
+				int _start = -1;
+				int _end   = -1;
+				std::array<ResultPoint, 2> _points;
 
-public:
-	FinderPattern() = default;
-	FinderPattern(int value, int start, int end, const std::array<ResultPoint, 2>& points) :
-		_value(value), _start(start), _end(end), _points(points) {}
+			public:
+				FinderPattern () = default;
+				FinderPattern (int value, int start, int end, const std::array<ResultPoint, 2>& points)
+					: _value (value)
+					, _start (start)
+					, _end (end)
+					, _points (points) {}
 
-	bool isValid() const {
-		return _value >= 0;
-	}
+				bool isValid () const {
+					return _value >= 0;
+				}
 
-	int value() const {
-		return _value;
-	}
+				int value () const {
+					return _value;
+				}
 
-	int startPos() const {
-		return _start;
-	}
+				int startPos () const {
+					return _start;
+				}
 
-	int endPos() const {
-		return _end;
-	}
+				int endPos () const {
+					return _end;
+				}
 
-	const std::array<ResultPoint, 2>& points() const {
-		return _points;
-	}
-};
+				const std::array<ResultPoint, 2>& points () const {
+					return _points;
+				}
+			};
 
-} // RSS
-} // OneD
+		} // RSS
+	}     // OneD
 } // ZXing

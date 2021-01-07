@@ -21,18 +21,17 @@
 
 namespace ZXing {
 
-class ReedSolomonEncoder
-{
-public:
-	explicit ReedSolomonEncoder(const GenericGF& field);
+	class ReedSolomonEncoder {
+	public:
+		explicit ReedSolomonEncoder (const GenericGF& field);
 
-	void encode(std::vector<int>& toEncode, int ecBytes);
+		void encode (std::vector<int>& toEncode, int ecBytes);
 
-private:
-	const GenericGF* _field;
-	std::list<GenericGFPoly> _cachedGenerators;
+	private:
+		const GenericGF* _field;
+		std::list<GenericGFPoly> _cachedGenerators;
 
-	const GenericGFPoly& buildGenerator(int degree);
-};
+		const GenericGFPoly& buildGenerator (int degree);
+	};
 
 } // ZXing

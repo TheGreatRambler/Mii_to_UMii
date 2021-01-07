@@ -16,12 +16,12 @@
 * limitations under the License.
 */
 
-#include "PerspectiveTransform.h"
 #include "DetectorResult.h"
+#include "PerspectiveTransform.h"
 
 namespace ZXing {
 
-/**
+	/**
 * Samples an image for a rectangular matrix of bits of the given dimension. The sampling
 * transformation is determined by the coordinates of 4 points, in the original and transformed
 * image space.
@@ -46,6 +46,6 @@ namespace ZXing {
 * @return {@link DetectorResult} representing a grid of points sampled from the image within a region
 *   defined by the "src" parameters. Result is empty if transformation is invalid (out of bound access).
 */
-DetectorResult SampleGrid(const BitMatrix& image, int width, int height, const PerspectiveTransform& mod2Pix);
+	DetectorResult SampleGrid (const BitMatrix& image, int width, int height, const PerspectiveTransform& mod2Pix);
 
 } // ZXing

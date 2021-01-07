@@ -22,21 +22,19 @@
 
 namespace ZXing {
 
-class Result;
+	class Result;
 
-namespace OneD {
+	namespace OneD {
 
-namespace UPCEANExtension5Support {
-int ExtensionChecksum(const std::string& s);
-std::string ParseExtension5String(const std::string& raw);
-} // namespace UPCEANExtension5Support
+		namespace UPCEANExtension5Support {
+			int ExtensionChecksum (const std::string& s);
+			std::string ParseExtension5String (const std::string& raw);
+		} // namespace UPCEANExtension5Support
 
-class UPCEANExtensionSupport
-{
-public:
-	static Result DecodeRow(int rowNumber, const BitArray& row, BitArray::Iterator begin);
-};
+		class UPCEANExtensionSupport {
+		public:
+			static Result DecodeRow (int rowNumber, const BitArray& row, BitArray::Iterator begin);
+		};
 
-
-} // OneD
+	} // OneD
 } // ZXing

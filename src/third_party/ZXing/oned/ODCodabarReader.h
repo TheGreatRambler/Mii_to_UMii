@@ -20,26 +20,25 @@
 
 namespace ZXing {
 
-class DecodeHints;
+	class DecodeHints;
 
-namespace OneD {
+	namespace OneD {
 
-/**
+		/**
 * <p>Decodes Codabar barcodes.</p>
 *
 * @author Bas Vijfwinkel
 * @author David Walker
 */
-class CodabarReader : public RowReader
-{
-public:
-	explicit CodabarReader(const DecodeHints& hints);
-	Result decodeRow(int rowNumber, const BitArray& row, std::unique_ptr<DecodingState>& state) const override;
-	Result decodePattern(int rowNumber, const PatternView& row, std::unique_ptr<DecodingState>& state) const override;
+		class CodabarReader : public RowReader {
+		public:
+			explicit CodabarReader (const DecodeHints& hints);
+			Result decodeRow (int rowNumber, const BitArray& row, std::unique_ptr<DecodingState>& state) const override;
+			Result decodePattern (int rowNumber, const PatternView& row, std::unique_ptr<DecodingState>& state) const override;
 
-private:
-	bool _returnStartEnd;
-};
+		private:
+			bool _returnStartEnd;
+		};
 
-} // OneD
+	} // OneD
 } // ZXing

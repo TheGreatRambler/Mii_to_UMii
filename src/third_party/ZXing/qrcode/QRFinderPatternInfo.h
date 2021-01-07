@@ -19,23 +19,24 @@
 #include "QRFinderPattern.h"
 
 namespace ZXing {
-namespace QRCode {
+	namespace QRCode {
 
-/**
+		/**
 * <p>Encapsulates information about finder patterns in an image, including the location of
 * the three finder patterns, and their estimated module size.</p>
 *
 * @author Sean Owen
 */
-class FinderPatternInfo
-{
-public:
-	FinderPattern bottomLeft;
-	FinderPattern topLeft;
-	FinderPattern topRight;
+		class FinderPatternInfo {
+		public:
+			FinderPattern bottomLeft;
+			FinderPattern topLeft;
+			FinderPattern topRight;
 
-	bool isValid() const { return bottomLeft.isValid() && topLeft.isValid() && topRight.isValid(); }
-};
+			bool isValid () const {
+				return bottomLeft.isValid () && topLeft.isValid () && topRight.isValid ();
+			}
+		};
 
-} // QRCode
+	} // QRCode
 } // ZXing

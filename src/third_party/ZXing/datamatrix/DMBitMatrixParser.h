@@ -18,19 +18,18 @@
 
 namespace ZXing {
 
-class BitMatrix;
-class ByteArray;
+	class BitMatrix;
+	class ByteArray;
 
-namespace DataMatrix {
+	namespace DataMatrix {
 
-class Version;
+		class Version;
 
-class BitMatrixParser
-{
-public:
-	static ByteArray ReadCodewords(const BitMatrix& bits);
-	static const Version* ReadVersion(const BitMatrix& bits);
-};
+		class BitMatrixParser {
+		public:
+			static ByteArray ReadCodewords (const BitMatrix& bits);
+			static const Version* ReadVersion (const BitMatrix& bits);
+		};
 
-} // DataMatrix
+	} // DataMatrix
 } // ZXing

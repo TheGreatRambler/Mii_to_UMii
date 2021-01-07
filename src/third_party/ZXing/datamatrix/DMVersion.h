@@ -19,46 +19,45 @@
 #include "DMECB.h"
 
 namespace ZXing {
-namespace DataMatrix {
+	namespace DataMatrix {
 
-/**
+		/**
 * The Version object encapsulates attributes about a particular
 * size Data Matrix Code.
 *
 * @author bbrown@google.com (Brian Brown)
 */
-class Version
-{
-public:
-	int versionNumber() const {
-		return _versionNumber;
-	}
+		class Version {
+		public:
+			int versionNumber () const {
+				return _versionNumber;
+			}
 
-	int symbolSizeRows() const {
-		return _symbolSizeRows;
-	}
+			int symbolSizeRows () const {
+				return _symbolSizeRows;
+			}
 
-	int symbolSizeColumns() const {
-		return _symbolSizeColumns;
-	}
+			int symbolSizeColumns () const {
+				return _symbolSizeColumns;
+			}
 
-	int dataRegionSizeRows() const {
-		return _dataRegionSizeRows;
-	}
+			int dataRegionSizeRows () const {
+				return _dataRegionSizeRows;
+			}
 
-	int dataRegionSizeColumns() const {
-		return _dataRegionSizeColumns;
-	}
+			int dataRegionSizeColumns () const {
+				return _dataRegionSizeColumns;
+			}
 
-	int totalCodewords() const {
-		return _ecBlocks.totalDataCodewords();
-	}
+			int totalCodewords () const {
+				return _ecBlocks.totalDataCodewords ();
+			}
 
-	const ECBlocks& ecBlocks() const {
-		return _ecBlocks;
-	}
+			const ECBlocks& ecBlocks () const {
+				return _ecBlocks;
+			}
 
-	/**
+			/**
 	* <p>Deduces version information from Data Matrix dimensions.</p>
 	*
 	* @param numRows Number of rows in modules
@@ -66,18 +65,18 @@ public:
 	* @return Version for a Data Matrix Code of those dimensions
 	* @throws FormatException if dimensions do correspond to a valid Data Matrix size
 	*/
-	static const Version* VersionForDimensions(int numRows, int numColumns);
+			static const Version* VersionForDimensions (int numRows, int numColumns);
 
-private:
-	int _versionNumber;
-	int _symbolSizeRows;
-	int _symbolSizeColumns;
-	int _dataRegionSizeRows;
-	int _dataRegionSizeColumns;
-	ECBlocks _ecBlocks;
+		private:
+			int _versionNumber;
+			int _symbolSizeRows;
+			int _symbolSizeColumns;
+			int _dataRegionSizeRows;
+			int _dataRegionSizeColumns;
+			ECBlocks _ecBlocks;
 
-	Version(int versionNumber, int symbolSizeRows, int symbolSizeColumns, int dataRegionSizeRows, int dataRegionSizeColumns, const ECBlocks& ecBlocks);
-};
+			Version (int versionNumber, int symbolSizeRows, int symbolSizeColumns, int dataRegionSizeRows, int dataRegionSizeColumns, const ECBlocks& ecBlocks);
+		};
 
-} // DataMatrix
+	} // DataMatrix
 } // ZXing

@@ -34,8 +34,7 @@
 
 #include <string>
 
-class Big5TextEncoder
-{
+class Big5TextEncoder {
 public:
-	static void EncodeBig5(const std::wstring& str, std::string& bytes);
+	static void EncodeBig5 (const std::wstring& str, std::string& bytes);
 };

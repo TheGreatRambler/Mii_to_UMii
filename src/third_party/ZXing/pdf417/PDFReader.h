@@ -20,19 +20,18 @@
 #include <list>
 
 namespace ZXing {
-namespace Pdf417 {
+	namespace Pdf417 {
 
-/**
+		/**
 * This implementation can detect and decode PDF417 codes in an image.
 *
 * @author Guenther Grau
 */
-class Reader : public ZXing::Reader
-{
-public:
-	Result decode(const BinaryBitmap& image) const override;
-	std::list<Result> decodeMultiple(const BinaryBitmap& image) const;
-};
+		class Reader : public ZXing::Reader {
+		public:
+			Result decode (const BinaryBitmap& image) const override;
+			std::list<Result> decodeMultiple (const BinaryBitmap& image) const;
+		};
 
-} // Pdf417
+	} // Pdf417
 } // ZXing

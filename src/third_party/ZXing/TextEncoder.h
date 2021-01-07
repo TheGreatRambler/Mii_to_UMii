@@ -19,17 +19,17 @@
 
 namespace ZXing {
 
-enum class CharacterSet;
+	enum class CharacterSet;
 
-class TextEncoder
-{
-	static void GetBytes(const std::wstring& str, CharacterSet charset, std::string& bytes);
-public:
-	static std::string FromUnicode(const std::wstring& str, CharacterSet charset) {
-		std::string r;
-		GetBytes(str, charset, r);
-		return r;
-	}
-};
+	class TextEncoder {
+		static void GetBytes (const std::wstring& str, CharacterSet charset, std::string& bytes);
+
+	public:
+		static std::string FromUnicode (const std::wstring& str, CharacterSet charset) {
+			std::string r;
+			GetBytes (str, charset, r);
+			return r;
+		}
+	};
 
 } // ZXing

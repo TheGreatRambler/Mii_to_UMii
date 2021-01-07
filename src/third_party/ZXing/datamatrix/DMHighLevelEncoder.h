@@ -19,22 +19,21 @@
 
 namespace ZXing {
 
-class ByteArray;
+	class ByteArray;
 
-namespace DataMatrix {
+	namespace DataMatrix {
 
-enum class SymbolShape;
+		enum class SymbolShape;
 
-/**
+		/**
 * DataMatrix ECC 200 data encoder following the algorithm described in ISO/IEC 16022:200(E) in
 * annex S.
 */
-class HighLevelEncoder
-{
-public:
-	static ByteArray Encode(const std::wstring& msg);
-	static ByteArray Encode(const std::wstring& msg, SymbolShape shape, int minWdith, int minHeight, int maxWidth, int maxHeight);
-};
+		class HighLevelEncoder {
+		public:
+			static ByteArray Encode (const std::wstring& msg);
+			static ByteArray Encode (const std::wstring& msg, SymbolShape shape, int minWdith, int minHeight, int maxWidth, int maxHeight);
+		};
 
-} // DataMatrix
+	} // DataMatrix
 } // ZXing

@@ -19,40 +19,41 @@
 #include "ResultPoint.h"
 
 namespace ZXing {
-namespace QRCode {
+	namespace QRCode {
 
-/**
+		/**
 * <p>Encapsulates an alignment pattern, which are the smaller square patterns found in
 * all but the simplest QR Codes.</p>
 *
 * @author Sean Owen
 */
-class AlignmentPattern : public ResultPoint
-{
-	float _estimatedModuleSize = 0;
+		class AlignmentPattern : public ResultPoint {
+			float _estimatedModuleSize = 0;
 
-public:
-	AlignmentPattern() = default;
-	AlignmentPattern(float posX, float posY, float estimatedModuleSize);
+		public:
+			AlignmentPattern () = default;
+			AlignmentPattern (float posX, float posY, float estimatedModuleSize);
 
-	float estimatedModuleSize() const {
-		return _estimatedModuleSize;
-	}
+			float estimatedModuleSize () const {
+				return _estimatedModuleSize;
+			}
 
-	bool isValid() const { return _estimatedModuleSize > 0.f; }
+			bool isValid () const {
+				return _estimatedModuleSize > 0.f;
+			}
 
-	/**
+			/**
 	* <p>Determines if this alignment pattern "about equals" an alignment pattern at the stated
 	* position and size -- meaning, it is at nearly the same center with nearly the same size.</p>
 	*/
-	bool aboutEquals(float moduleSize, float i, float j) const;
+			bool aboutEquals (float moduleSize, float i, float j) const;
 
-	/**
+			/**
 	* Combines this object's current estimate of a finder pattern position and module size
 	* with a new estimate. It returns a new {@code FinderPattern} containing an average of the two.
 	*/
-	AlignmentPattern combineEstimate(float i, float j, float newModuleSize) const;
-};
+			AlignmentPattern combineEstimate (float i, float j, float newModuleSize) const;
+		};
 
-} // QRCode
+	} // QRCode
 } // ZXing

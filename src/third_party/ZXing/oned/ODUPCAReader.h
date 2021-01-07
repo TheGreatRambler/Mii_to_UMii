@@ -19,29 +19,30 @@
 #include "ODEAN13Reader.h"
 
 namespace ZXing {
-namespace OneD {
+	namespace OneD {
 
-/**
+		/**
 * <p>Implements decoding of the UPC-A format.</p>
 *
 * @author dswitkin@google.com (Daniel Switkin)
 * @author Sean Owen
 */
-class UPCAReader : public UPCEANReader
-{
-public:
-	explicit UPCAReader(const DecodeHints& hints) : UPCEANReader(hints), _reader(hints) {}
+		class UPCAReader : public UPCEANReader {
+		public:
+			explicit UPCAReader (const DecodeHints& hints)
+				: UPCEANReader (hints)
+				, _reader (hints) {}
 
-	Result decodeRow(int rowNumber, const BitArray& row, std::unique_ptr<DecodingState>& state) const override;
-	Result decodeRow(int rowNumber, const BitArray& row, BitArray::Range startGuard) const override;
+			Result decodeRow (int rowNumber, const BitArray& row, std::unique_ptr<DecodingState>& state) const override;
+			Result decodeRow (int rowNumber, const BitArray& row, BitArray::Range startGuard) const override;
 
-protected:
-	BarcodeFormat expectedFormat() const override;
-	BitArray::Range decodeMiddle(const BitArray& row, BitArray::Iterator begin, std::string& resultString) const override;
+		protected:
+			BarcodeFormat expectedFormat () const override;
+			BitArray::Range decodeMiddle (const BitArray& row, BitArray::Iterator begin, std::string& resultString) const override;
 
-private:
-	EAN13Reader _reader;
-};
+		private:
+			EAN13Reader _reader;
+		};
 
-} // OneD
+	} // OneD
 } // ZXing

@@ -116,7 +116,7 @@ namespace Mii {
 		int zora_body_color = 0;
 	};
 
-	static const std::unordered_map<int, std::string> FavoriteColors {
+	static const std::unordered_map<int, std::string> FavoriteColors{
 		{ 0, "Red" },
 		{ 1, "Orange" },
 		{ 2, "Yellow" },
@@ -131,7 +131,7 @@ namespace Mii {
 		{ 11, "Black" },
 	};
 
-	static const std::unordered_map<int, std::string> Types {
+	static const std::unordered_map<int, std::string> Types{
 		{ 0x00, "Special Mii - Gold Pants" },
 		{ 0x20, "Normal Mii - Black Pants" },
 		{ 0x40, "Special Mii - Gold Pants" },
@@ -141,14 +141,14 @@ namespace Mii {
 		{ 0x100, "???" },
 	};
 
-	static const std::unordered_map<int, int> Makeup {
+	static const std::unordered_map<int, int> Makeup{
 		{ 1, 1 },
 		{ 2, 6 },
 		{ 3, 9 },
 		{ 9, 10 },
 	};
 
-	static const std::unordered_map<int, int> Wrinkles {
+	static const std::unordered_map<int, int> Wrinkles{
 		{ 4, 5 },
 		{ 5, 2 },
 		{ 6, 3 },
@@ -158,7 +158,7 @@ namespace Mii {
 		{ 11, 1 },
 	};
 
-	static const std::unordered_map<int, int> SkinTone {
+	static const std::unordered_map<int, int> SkinTone{
 		{ 0, 0 },  //	Yellow, Light
 		{ 1, 1 },  //	Yellow, Dark
 		{ 7, 2 },  //	Yellow, Fair
@@ -172,7 +172,7 @@ namespace Mii {
 		{ 2, 10 }, //	Brown, Light
 	};
 
-	static const std::unordered_map<int, float> EyeRotBase {
+	static const std::unordered_map<int, float> EyeRotBase{
 		{ 0x02, 4.0 },
 		{ 0x11, 4.0 },
 		{ 0x01, 4.0 },
@@ -235,7 +235,7 @@ namespace Mii {
 		{ 0x33, 3.0 },
 	};
 
-	static const std::unordered_map<int, float> EyebrowRotBase {
+	static const std::unordered_map<int, float> EyebrowRotBase{
 		{ 0x09, 7.0 },
 		{ 0x07, 7.0 },
 		{ 0x11, 7.0 },

@@ -262,7 +262,6 @@ namespace kaitai {
 
 		static const int ZLIB_BUF_SIZE = 128 * 1024;
 	};
-
 }
 
 #endif

@@ -63,9 +63,8 @@
 
 #include <string>
 
-class JPTextEncoder
-{
+class JPTextEncoder {
 public:
-	static void EncodeShiftJIS(const std::wstring& str, std::string& bytes);
-	static void EncodeEUCJP(const std::wstring& str, std::string& bytes);
+	static void EncodeShiftJIS (const std::wstring& str, std::string& bytes);
+	static void EncodeEUCJP (const std::wstring& str, std::string& bytes);
 };

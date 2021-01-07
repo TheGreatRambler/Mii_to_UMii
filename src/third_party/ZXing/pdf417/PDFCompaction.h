@@ -17,14 +17,14 @@
 */
 
 namespace ZXing {
-namespace Pdf417 {
+	namespace Pdf417 {
 
-enum class Compaction {
-	AUTO,
-	TEXT,
-	BYTE,
-	NUMERIC
-};
+		enum class Compaction {
+			AUTO,
+			TEXT,
+			BYTE,
+			NUMERIC
+		};
 
-} // Pdf417
+	} // Pdf417
 } // ZXing

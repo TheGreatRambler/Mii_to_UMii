@@ -19,20 +19,19 @@
 #include "ODRowReader.h"
 
 namespace ZXing {
-namespace OneD {
+	namespace OneD {
 
-/**
+		/**
 * <p>Decodes Code 93 barcodes.</p>
 *
 * @author Sean Owen
 * @see Code39Reader
 */
-class Code93Reader : public RowReader
-{
-public:
-	Result decodeRow(int rowNumber, const BitArray& row, std::unique_ptr<DecodingState>& state) const override;
-	Result decodePattern(int rowNumber, const PatternView& row, std::unique_ptr<DecodingState>&) const override;
-};
+		class Code93Reader : public RowReader {
+		public:
+			Result decodeRow (int rowNumber, const BitArray& row, std::unique_ptr<DecodingState>& state) const override;
+			Result decodePattern (int rowNumber, const PatternView& row, std::unique_ptr<DecodingState>&) const override;
+		};
 
-} // OneD
+	} // OneD
 } // ZXing

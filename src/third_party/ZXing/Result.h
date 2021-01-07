@@ -16,12 +16,12 @@
 * limitations under the License.
 */
 
-#include "ByteArray.h"
 #include "BarcodeFormat.h"
-#include "Quadrilateral.h"
-#include "ResultPoint.h"
-#include "ResultMetadata.h"
+#include "ByteArray.h"
 #include "DecodeStatus.h"
+#include "Quadrilateral.h"
+#include "ResultMetadata.h"
+#include "ResultPoint.h"
 
 #include <string>
 #include <utility>
@@ -29,87 +29,86 @@
 
 namespace ZXing {
 
-class DecoderResult;
+	class DecoderResult;
 
-using Position = QuadrilateralI;
+	using Position = QuadrilateralI;
 
-/**
+	/**
 * <p>Encapsulates the result of decoding a barcode within an image.</p>
 *
 * @author Sean Owen
 */
-class Result
-{
-public:
-	explicit Result(DecodeStatus status) : _status(status) {}
+	class Result {
+	public:
+		explicit Result (DecodeStatus status)
+			: _status (status) {}
 
-	Result(std::wstring&& text, Position&& position, BarcodeFormat format, ByteArray&& rawBytes = {});
+		Result (std::wstring&& text, Position&& position, BarcodeFormat format, ByteArray&& rawBytes = {});
 
-	// 1D convenience constructor
-	Result(const std::string& text, int y, int xStart, int xStop, BarcodeFormat format, ByteArray&& rawBytes = {});
+		// 1D convenience constructor
+		Result (const std::string& text, int y, int xStart, int xStop, BarcodeFormat format, ByteArray&& rawBytes = {});
 
-	Result(DecoderResult&& decodeResult, Position&& position, BarcodeFormat format);
+		Result (DecoderResult&& decodeResult, Position&& position, BarcodeFormat format);
 
-	bool isValid() const {
-		return StatusIsOK(_status);
-	}
+		bool isValid () const {
+			return StatusIsOK (_status);
+		}
 
-	DecodeStatus status() const {
-		return _status;
-	}
+		DecodeStatus status () const {
+			return _status;
+		}
 
-	BarcodeFormat format() const {
-		return _format;
-	}
-	void setFormat(BarcodeFormat format) {
-		_format = format;
-	}
+		BarcodeFormat format () const {
+			return _format;
+		}
+		void setFormat (BarcodeFormat format) {
+			_format = format;
+		}
 
-	const std::wstring& text() const {
-		return _text;
-	}
-	void setText(std::wstring&& text) {
-		_text = std::move(text);
-	}
+		const std::wstring& text () const {
+			return _text;
+		}
+		void setText (std::wstring&& text) {
+			_text = std::move (text);
+		}
 
-	const Position& position() const {
-		return _position;
-	}
-	void setPosition(Position pos) {
-		_position = pos;
-	}
+		const Position& position () const {
+			return _position;
+		}
+		void setPosition (Position pos) {
+			_position = pos;
+		}
 
-	int orientation() const; //< orientation of barcode in degree, see also Position::orientation()
+		int orientation () const; //< orientation of barcode in degree, see also Position::orientation()
 
-	const ByteArray& rawBytes() const {
-		return _rawBytes;
-	}
-	
-	int numBits() const {
-		return _numBits;
-	}
+		const ByteArray& rawBytes () const {
+			return _rawBytes;
+		}
 
-	[[deprecated]]
-	std::vector<ResultPoint> resultPoints() const {
-		return {position().begin(), position().end()};
-	}
+		int numBits () const {
+			return _numBits;
+		}
 
-	const ResultMetadata& metadata() const {
-		return _metadata;
-	}
+		[[deprecated]] std::vector<ResultPoint> resultPoints () const {
+			return { position ().begin (), position ().end () };
+		}
 
-	ResultMetadata& metadata() {
-		return _metadata;
-	}
+		const ResultMetadata& metadata () const {
+			return _metadata;
+		}
 
-private:
-	DecodeStatus _status = DecodeStatus::NoError;
-	BarcodeFormat _format = BarcodeFormat::NONE;
-	std::wstring _text;
-	Position _position;
-	ByteArray _rawBytes;
-	int _numBits = 0;
-	ResultMetadata _metadata;
-};
+		ResultMetadata& metadata () {
+			return _metadata;
+		}
+
+	private:
+		DecodeStatus _status  = DecodeStatus::NoError;
+		BarcodeFormat _format = BarcodeFormat::NONE;
+		std::wstring _text;
+		Position _position;
+		ByteArray _rawBytes;
+		int _numBits = 0;
+		ResultMetadata _metadata;
+	};
 
 } // ZXing

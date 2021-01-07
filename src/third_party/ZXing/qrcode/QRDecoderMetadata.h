@@ -19,27 +19,27 @@
 #include "CustomData.h"
 
 namespace ZXing {
-namespace QRCode {
+	namespace QRCode {
 
-/**
+		/**
 * Meta-data container for QR Code decoding. Instances of this class may be used to convey information back to the
 * decoding caller. Callers are expected to process this.
 */
 
-class DecoderMetadata : public CustomData
-{
-	bool _mirrored;
+		class DecoderMetadata : public CustomData {
+			bool _mirrored;
 
-public:
-	explicit DecoderMetadata(bool mirrored) : _mirrored(mirrored) {}
+		public:
+			explicit DecoderMetadata (bool mirrored)
+				: _mirrored (mirrored) {}
 
-	/**
+			/**
 	* @return true if the QR Code was mirrored.
 	*/
-	bool isMirrored() const {
-		return _mirrored;
-	}
-};
+			bool isMirrored () const {
+				return _mirrored;
+			}
+		};
 
-} // QRCode
+	} // QRCode
 } // ZXing

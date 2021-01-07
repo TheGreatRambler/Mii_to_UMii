@@ -20,31 +20,37 @@
 #include <utility>
 
 namespace ZXing {
-namespace Aztec {
+	namespace Aztec {
 
-class DetectorResult : public ZXing::DetectorResult
-{
-	bool _compact = false;
-	int _nbDatablocks = 0;
-	int _nbLayers = 0;
+		class DetectorResult : public ZXing::DetectorResult {
+			bool _compact     = false;
+			int _nbDatablocks = 0;
+			int _nbLayers     = 0;
 
-	DetectorResult(const DetectorResult&) = delete;
-	DetectorResult& operator=(const DetectorResult&) = delete;
+			DetectorResult (const DetectorResult&) = delete;
+			DetectorResult& operator= (const DetectorResult&) = delete;
 
-public:
-	DetectorResult() = default;
-	DetectorResult(DetectorResult&&) = default;
-	DetectorResult& operator=(DetectorResult&&) = default;
+		public:
+			DetectorResult ()                 = default;
+			DetectorResult (DetectorResult&&) = default;
+			DetectorResult& operator= (DetectorResult&&) = default;
 
-	DetectorResult(ZXing::DetectorResult&& result, bool isCompact, int nbDatablocks, int nbLayers)
-		: ZXing::DetectorResult{std::move(result)}, _compact(isCompact), _nbDatablocks(nbDatablocks),
-		  _nbLayers(nbLayers)
-	{}
+			DetectorResult (ZXing::DetectorResult&& result, bool isCompact, int nbDatablocks, int nbLayers)
+				: ZXing::DetectorResult{ std::move (result) }
+				, _compact (isCompact)
+				, _nbDatablocks (nbDatablocks)
+				, _nbLayers (nbLayers) {}
 
-	bool isCompact() const { return _compact; }
-	int nbDatablocks() const { return _nbDatablocks; }
-	int nbLayers() const { return _nbLayers; }
-};
+			bool isCompact () const {
+				return _compact;
+			}
+			int nbDatablocks () const {
+				return _nbDatablocks;
+			}
+			int nbLayers () const {
+				return _nbLayers;
+			}
+		};
 
-} // Aztec
+	} // Aztec
 } // ZXing

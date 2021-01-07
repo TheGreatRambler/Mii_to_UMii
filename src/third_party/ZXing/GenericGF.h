@@ -20,12 +20,12 @@
 
 #include <algorithm>
 #include <cassert>
-#include <vector>
 #include <stdexcept>
+#include <vector>
 
 namespace ZXing {
 
-/**
+	/**
 * <p>This class contains utility methods for performing mathematical operations over
 * the Galois Fields. Operations use a given primitive polynomial in calculations.</p>
 *
@@ -36,108 +36,105 @@ namespace ZXing {
 * @author Sean Owen
 * @author David Olivier
 */
-class GenericGF
-{
-public:
-	static const GenericGF& AztecData12();
-	static const GenericGF& AztecData10();
-	static const GenericGF& AztecData6();
-	static const GenericGF& AztecParam();
-	static const GenericGF& QRCodeField256();
-	static const GenericGF& DataMatrixField256();
-	static const GenericGF& AztecData8();
-	static const GenericGF& MaxiCodeField64();
+	class GenericGF {
+	public:
+		static const GenericGF& AztecData12 ();
+		static const GenericGF& AztecData10 ();
+		static const GenericGF& AztecData6 ();
+		static const GenericGF& AztecParam ();
+		static const GenericGF& QRCodeField256 ();
+		static const GenericGF& DataMatrixField256 ();
+		static const GenericGF& AztecData8 ();
+		static const GenericGF& MaxiCodeField64 ();
 
-	/**
+		/**
 	* @return the monomial representing coefficient * x^degree
 	*/
-	GenericGFPoly& setMonomial(GenericGFPoly& poly, int degree, int coefficient) const
-	{
-		assert(degree >= 0);
+		GenericGFPoly& setMonomial (GenericGFPoly& poly, int degree, int coefficient) const {
+			assert (degree >= 0);
 
-		if (coefficient == 0)
-			degree = 0;
+			if (coefficient == 0)
+				degree = 0;
 
-		poly._field = this;
-		poly._coefficients.resize(degree + 1);
-		std::fill(poly._coefficients.begin(), poly._coefficients.end(), 0);
-		poly._coefficients.front() = coefficient;
+			poly._field = this;
+			poly._coefficients.resize (degree + 1);
+			std::fill (poly._coefficients.begin (), poly._coefficients.end (), 0);
+			poly._coefficients.front () = coefficient;
 
-		return poly;
-	}
+			return poly;
+		}
 
-	GenericGFPoly& setZero(GenericGFPoly& poly) const {
-		return setMonomial(poly, 0, 0);
-	}
+		GenericGFPoly& setZero (GenericGFPoly& poly) const {
+			return setMonomial (poly, 0, 0);
+		}
 
-	GenericGFPoly& setOne(GenericGFPoly& poly) const {
-		return setMonomial(poly, 0, 1);
-	}
+		GenericGFPoly& setOne (GenericGFPoly& poly) const {
+			return setMonomial (poly, 0, 1);
+		}
 
-	/**
+		/**
 	* Implements both addition and subtraction -- they are the same in GF(size).
 	*
 	* @return sum/difference of a and b
 	*/
-	int addOrSubtract(int a, int b) const noexcept {
-		return a ^ b;
-	}
+		int addOrSubtract (int a, int b) const noexcept {
+			return a ^ b;
+		}
 
-	/**
+		/**
 	* @return 2 to the power of a in GF(size)
 	*/
-	int exp(int a) const {
-		return _expTable.at(a);
-	}
+		int exp (int a) const {
+			return _expTable.at (a);
+		}
 
-	/**
+		/**
 	* @return base 2 log of a in GF(size)
 	*/
-	int log(int a) const {
-		if (a == 0) {
-			throw std::invalid_argument("a == 0");
+		int log (int a) const {
+			if (a == 0) {
+				throw std::invalid_argument ("a == 0");
+			}
+			return _logTable.at (a);
 		}
-		return _logTable.at(a);
-	}
 
-	/**
+		/**
 	* @return multiplicative inverse of a
 	*/
-	int inverse(int a) const {
-		return _expTable[_size - log(a) - 1];
-	}
+		int inverse (int a) const {
+			return _expTable[_size - log (a) - 1];
+		}
 
-	/**
+		/**
 	* @return product of a and b in GF(size)
 	*/
-	int multiply(int a, int b) const noexcept {
-		if (a == 0 || b == 0) {
-			return 0;
+		int multiply (int a, int b) const noexcept {
+			if (a == 0 || b == 0) {
+				return 0;
+			}
+			auto fast_mod = [](const int input, const int ceil) {
+				// avoid using the '%' modulo operator => ReedSolomon computation is more than twice as fast
+				// see also https://stackoverflow.com/a/33333636/2088798
+				return input < ceil ? input : input - ceil;
+			};
+			return _expTable[fast_mod (_logTable[a] + _logTable[b], _size - 1)];
 		}
-		auto fast_mod = [](const int input, const int ceil) {
-			// avoid using the '%' modulo operator => ReedSolomon computation is more than twice as fast
-			// see also https://stackoverflow.com/a/33333636/2088798
-			return input < ceil ? input : input - ceil;
-		};
-		return _expTable[fast_mod(_logTable[a] + _logTable[b], _size - 1)];
-	}
 
-	
-	int size() const {
-		return _size;
-	}
+		int size () const {
+			return _size;
+		}
 
-	int generatorBase() const {
-		return _generatorBase;
-	}
+		int generatorBase () const {
+			return _generatorBase;
+		}
 
-private:
-	const int _size;
-	int _generatorBase;
-	std::vector<int> _expTable;
-	std::vector<int> _logTable;
+	private:
+		const int _size;
+		int _generatorBase;
+		std::vector<int> _expTable;
+		std::vector<int> _logTable;
 
-	/**
+		/**
 	* Create a representation of GF(size) using the given primitive polynomial.
 	*
 	* @param primitive irreducible polynomial whose coefficients are represented by
@@ -148,7 +145,7 @@ private:
 	*  (g(x) = (x+a^b)(x+a^(b+1))...(x+a^(b+2t-1))).
 	*  In most cases it should be 1, but for QR code it is 0.
 	*/
-	GenericGF(int primitive, int size, int b);
-};
+		GenericGF (int primitive, int size, int b);
+	};
 
 } // ZXing

@@ -19,24 +19,26 @@
 
 namespace ZXing {
 
-class BitMatrix;
+	class BitMatrix;
 
-namespace OneD {
+	namespace OneD {
 
-/**
+		/**
 * This class renders CodaBar as {@code boolean[]}.
 *
 * @author dsbnatut@gmail.com (Kazuki Nishiura)
 */
-class CodabarWriter
-{
-public:
-	CodabarWriter& setMargin(int sidesMargin) { _sidesMargin = sidesMargin; return *this; }
-	BitMatrix encode(const std::wstring& contents, int width, int height) const;
+		class CodabarWriter {
+		public:
+			CodabarWriter& setMargin (int sidesMargin) {
+				_sidesMargin = sidesMargin;
+				return *this;
+			}
+			BitMatrix encode (const std::wstring& contents, int width, int height) const;
 
-private:
-	int _sidesMargin = -1;
-};
+		private:
+			int _sidesMargin = -1;
+		};
 
-} // OneD
+	} // OneD
 } // ZXing

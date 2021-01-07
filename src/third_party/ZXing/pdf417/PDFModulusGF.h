@@ -21,72 +21,71 @@
 #include <stdexcept>
 
 namespace ZXing {
-namespace Pdf417 {
+	namespace Pdf417 {
 
-/**
+		/**
 * <p>A field based on powers of a generator integer, modulo some modulus.< / p>
 *
 * @author Sean Owen
 * @see com.google.zxing.common.reedsolomon.GenericGF
 */
-class ModulusGF
-{
-	int _modulus;
-	std::vector<int> _expTable;
-	std::vector<int> _logTable;
-	ModulusPoly _zero;
-	ModulusPoly _one;
+		class ModulusGF {
+			int _modulus;
+			std::vector<int> _expTable;
+			std::vector<int> _logTable;
+			ModulusPoly _zero;
+			ModulusPoly _one;
 
-public:
-	ModulusGF(int modulus, int generator);
+		public:
+			ModulusGF (int modulus, int generator);
 
-	const ModulusPoly& zero() const {
-		return _zero;
-	}
+			const ModulusPoly& zero () const {
+				return _zero;
+			}
 
-	const ModulusPoly& one() const {
-		return _one;
-	}
+			const ModulusPoly& one () const {
+				return _one;
+			}
 
-	ModulusPoly buildMonomial(int degree, int coefficient) const;
+			ModulusPoly buildMonomial (int degree, int coefficient) const;
 
-	int add(int a, int b) const {
-		return (a + b) % _modulus;
-	}
+			int add (int a, int b) const {
+				return (a + b) % _modulus;
+			}
 
-	int subtract(int a, int b) const {
-		return (_modulus + a - b) % _modulus;
-	}
+			int subtract (int a, int b) const {
+				return (_modulus + a - b) % _modulus;
+			}
 
-	int exp(int a) const {
-		return _expTable.at(a);
-	}
+			int exp (int a) const {
+				return _expTable.at (a);
+			}
 
-	int log(int a) const {
-		if (a == 0) {
-			throw std::invalid_argument("a == 0");
-		}
-		return _logTable[a];
-	}
+			int log (int a) const {
+				if (a == 0) {
+					throw std::invalid_argument ("a == 0");
+				}
+				return _logTable[a];
+			}
 
-	int inverse(int a) const {
-		if (a == 0) {
-			throw std::invalid_argument("a == 0");
-		}
-		return _expTable[_modulus - _logTable[a] - 1];
-	}
+			int inverse (int a) const {
+				if (a == 0) {
+					throw std::invalid_argument ("a == 0");
+				}
+				return _expTable[_modulus - _logTable[a] - 1];
+			}
 
-	int multiply(int a, int b) const {
-		if (a == 0 || b == 0) {
-			return 0;
-		}
-		return _expTable[(_logTable[a] + _logTable[b]) % (_modulus - 1)];
-	}
+			int multiply (int a, int b) const {
+				if (a == 0 || b == 0) {
+					return 0;
+				}
+				return _expTable[(_logTable[a] + _logTable[b]) % (_modulus - 1)];
+			}
 
-	int size() const {
-		return _modulus;
-	}
-};
+			int size () const {
+				return _modulus;
+			}
+		};
 
-} // Pdf417
+	} // Pdf417
 } // ZXing

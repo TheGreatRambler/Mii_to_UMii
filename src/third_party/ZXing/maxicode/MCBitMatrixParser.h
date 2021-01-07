@@ -18,23 +18,22 @@
 
 namespace ZXing {
 
-class ByteArray;
-class BitMatrix;
+	class ByteArray;
+	class BitMatrix;
 
-namespace MaxiCode {
+	namespace MaxiCode {
 
-/**
+		/**
 * @author mike32767
 * @author Manuel Kasten
 */
-class BitMatrixParser
-{
-public:
-	static ByteArray ReadCodewords(const BitMatrix& image);
+		class BitMatrixParser {
+		public:
+			static ByteArray ReadCodewords (const BitMatrix& image);
 
-	static const int MATRIX_WIDTH = 30;
-	static const int MATRIX_HEIGHT = 33;
-};
+			static const int MATRIX_WIDTH  = 30;
+			static const int MATRIX_HEIGHT = 33;
+		};
 
-} // MaxiCode
+	} // MaxiCode
 } // ZXing

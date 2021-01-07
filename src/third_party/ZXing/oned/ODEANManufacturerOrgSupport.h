@@ -19,9 +19,9 @@
 #include <string>
 
 namespace ZXing {
-namespace OneD {
+	namespace OneD {
 
-/**
+		/**
 * Records EAN prefix to GS1 Member Organization, where the member organization
 * correlates strongly with a country. This is an imperfect means of identifying
 * a country of origin by EAN-13 barcode value. See
@@ -30,11 +30,10 @@ namespace OneD {
 *
 * @author Sean Owen
 */
-class EANManufacturerOrgSupport
-{
-public:
-	static std::string LookupCountryIdentifier(const std::string& productCode);
-};
+		class EANManufacturerOrgSupport {
+		public:
+			static std::string LookupCountryIdentifier (const std::string& productCode);
+		};
 
-} // OneD
+	} // OneD
 } // ZXing

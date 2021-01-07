@@ -18,21 +18,20 @@
 
 namespace ZXing {
 
-class DecoderResult;
-class BitMatrix;
+	class DecoderResult;
+	class BitMatrix;
 
-namespace DataMatrix {
+	namespace DataMatrix {
 
-/**
+		/**
 * <p>The main class which implements Data Matrix Code decoding -- as opposed to locating and extracting
 * the Data Matrix Code from an image.</p>
 *
 * @author bbrown@google.com (Brian Brown)
 */
-class Decoder
-{
-public:
-	/**
+		class Decoder {
+		public:
+			/**
 	* <p>Convenience method that can decode a Data Matrix Code represented as a 2D array of booleans.
 	* "true" is taken to mean a black module.</p>
 	*
@@ -41,9 +40,9 @@ public:
 	* @throws FormatException if the Data Matrix Code cannot be decoded
 	* @throws ChecksumException if error correction fails
 	*/
-	//DecoderResult decode(boolean[][] image);
+			//DecoderResult decode(boolean[][] image);
 
-	/**
+			/**
 	* <p>Decodes a Data Matrix Code represented as a {@link BitMatrix}. A 1 or "true" is taken
 	* to mean a black module.</p>
 	*
@@ -52,8 +51,8 @@ public:
 	* @throws FormatException if the Data Matrix Code cannot be decoded
 	* @throws ChecksumException if error correction fails
 	*/
-	static DecoderResult Decode(const BitMatrix& bits);
-};
+			static DecoderResult Decode (const BitMatrix& bits);
+		};
 
-} // DataMatrix
+	} // DataMatrix
 } // ZXing

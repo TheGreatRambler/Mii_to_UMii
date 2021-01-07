@@ -20,9 +20,9 @@
 
 namespace ZXing {
 
-class ByteArray;
+	class ByteArray;
 
-/**
+	/**
 * The purpose of this class hierarchy is to abstract different bitmap implementations across
 * platforms into a standard interface for requesting greyscale luminance values. The interface
 * only provides immutable methods; therefore crop and rotation create copies. This is to ensure
@@ -31,22 +31,21 @@ class ByteArray;
 *
 * @author dswitkin@google.com (Daniel Switkin)
 */
-class LuminanceSource
-{
-public:
-	virtual ~LuminanceSource() = default;
+	class LuminanceSource {
+	public:
+		virtual ~LuminanceSource () = default;
 
-	/**
+		/**
 	* @return The width of the bitmap.
 	*/
-	virtual int width() const = 0;
+		virtual int width () const = 0;
 
-	/**
+		/**
 	* @return The height of the bitmap.
 	*/
-	virtual int height() const = 0;
+		virtual int height () const = 0;
 
-	/**
+		/**
 	* Fetches one row of luminance data from the underlying platform's bitmap. Values range from
 	* 0 (black) to 255 (white). Because Java does not have an unsigned byte type, callers will have
 	* to bitwise and with 0xff for each value. It is preferable for implementations of this method
@@ -58,9 +57,9 @@ public:
 	*            Always use the returned object, and ignore the .length of the array.
 	* @return An array containing the luminance data.
 	*/
-	virtual const uint8_t* getRow(int y, ByteArray& buffer, bool forceCopy = false) const = 0;
+		virtual const uint8_t* getRow (int y, ByteArray& buffer, bool forceCopy = false) const = 0;
 
-	/**
+		/**
 	* Fetches luminance data for the underlying bitmap. Values should be fetched using:
 	* {@code int luminance = array[y * width + x] & 0xff}
 	*
@@ -68,14 +67,14 @@ public:
 	*         larger than width * height bytes on some platforms. Do not modify the contents
 	*         of the result.
 	*/
-	virtual const uint8_t* getMatrix(ByteArray& buffer, int& outRowBytes, bool forceCopy = false) const = 0;
+		virtual const uint8_t* getMatrix (ByteArray& buffer, int& outRowBytes, bool forceCopy = false) const = 0;
 
-	/**
+		/**
 	* @return Whether this subclass supports cropping.
 	*/
-	virtual bool canCrop() const;
+		virtual bool canCrop () const;
 
-	/**
+		/**
 	* Returns a new object with cropped image data. Implementations may keep a reference to the
 	* original data rather than a copy. Only callable if isCropSupported() is true.
 	*
@@ -85,30 +84,29 @@ public:
 	* @param height The height of the rectangle to crop.
 	* @return A cropped version of this object.
 	*/
-	virtual std::shared_ptr<LuminanceSource> cropped(int left, int top, int width, int height) const;
+		virtual std::shared_ptr<LuminanceSource> cropped (int left, int top, int width, int height) const;
 
-	/**
+		/**
 	* @return Whether this subclass supports counter-clockwise rotation.
 	*/
-	virtual bool canRotate() const;
+		virtual bool canRotate () const;
 
-	/**
+		/**
 	* Returns a new object with rotated image data by 90 degrees counterclockwise.
 	* Only callable if {@link #isRotateSupported()} is true.
 	*
 	* @return A rotated version of this object.
 	*/
-	virtual std::shared_ptr<LuminanceSource> rotated(int degreeCW) const;
+		virtual std::shared_ptr<LuminanceSource> rotated (int degreeCW) const;
 
-	/**
+		/**
 	* @return a wrapper of this {@code LuminanceSource} which inverts the luminances it returns -- black becomes
 	*  white and vice versa, and each value becomes (255-value).
 	*/
-	static std::shared_ptr<LuminanceSource> CreateInverted(const std::shared_ptr<LuminanceSource>& src);
+		static std::shared_ptr<LuminanceSource> CreateInverted (const std::shared_ptr<LuminanceSource>& src);
 
-protected:
-	virtual std::shared_ptr<LuminanceSource> getInverted() const;
-
-};
+	protected:
+		virtual std::shared_ptr<LuminanceSource> getInverted () const;
+	};
 
 } // ZXing

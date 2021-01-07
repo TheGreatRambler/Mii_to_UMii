@@ -20,24 +20,23 @@
 
 namespace ZXing {
 
-class BitArray;
-enum class DecodeStatus;
+	class BitArray;
+	enum class DecodeStatus;
 
-namespace OneD {
-namespace RSS {
+	namespace OneD {
+		namespace RSS {
 
-/**
+			/**
 * @author Pablo Orduña, University of Deusto (pablo.orduna@deusto.es)
 * @author Eduardo Castillejo, University of Deusto (eduardo.castillejo@deusto.es)
 */
-class GenericAppIdDecoder
-{
-public:
-	static int ExtractNumeric(const BitArray& bits, int pos, int count);
-	static DecodeStatus DecodeGeneralPurposeField(const BitArray& bits, int pos, std::string& result);
-	static DecodeStatus DecodeAllCodes(const BitArray& bits, int initialPosition, std::string& result);
-};
+			class GenericAppIdDecoder {
+			public:
+				static int ExtractNumeric (const BitArray& bits, int pos, int count);
+				static DecodeStatus DecodeGeneralPurposeField (const BitArray& bits, int pos, std::string& result);
+				static DecodeStatus DecodeAllCodes (const BitArray& bits, int initialPosition, std::string& result);
+			};
 
-} // RSS
-} // OneD
+		} // RSS
+	}     // OneD
 } // ZXing

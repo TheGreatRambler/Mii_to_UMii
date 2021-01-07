@@ -20,22 +20,22 @@
 
 namespace ZXing {
 
-class DecodeHints;
+	class DecodeHints;
 
-namespace DataMatrix {
+	namespace DataMatrix {
 
-/**
+		/**
 * This implementation can detect and decode Data Matrix codes in an image.
 *
 * @author bbrown@google.com (Brian Brown)
 */
-class Reader : public ZXing::Reader
-{
-	bool _tryRotate, _tryHarder, _isPure;
-public:
-	explicit Reader(const DecodeHints& hints);
-	Result decode(const BinaryBitmap& image) const override;
-};
+		class Reader : public ZXing::Reader {
+			bool _tryRotate, _tryHarder, _isPure;
 
-} // DataMatrix
+		public:
+			explicit Reader (const DecodeHints& hints);
+			Result decode (const BinaryBitmap& image) const override;
+		};
+
+	} // DataMatrix
 } // ZXing

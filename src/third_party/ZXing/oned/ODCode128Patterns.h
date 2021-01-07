@@ -19,11 +19,11 @@
 #include <vector>
 
 namespace ZXing {
-namespace OneD {
-namespace Code128 {
+	namespace OneD {
+		namespace Code128 {
 
-extern const std::array<std::vector<int>, 107> CODE_PATTERNS;
+			extern const std::array<std::vector<int>, 107> CODE_PATTERNS;
 
-} // Code128
-} // OneD
+		} // Code128
+	}     // OneD
 } // ZXing

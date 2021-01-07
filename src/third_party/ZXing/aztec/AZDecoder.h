@@ -18,23 +18,22 @@
 
 namespace ZXing {
 
-class DecoderResult;
+	class DecoderResult;
 
-namespace Aztec {
+	namespace Aztec {
 
-class DetectorResult;
+		class DetectorResult;
 
-/**
+		/**
 * <p>The main class which implements Aztec Code decoding -- as opposed to locating and extracting
 * the Aztec Code from an image.</p>
 *
 * @author David Olivier
 */
-class Decoder
-{
-public:
-	static DecoderResult Decode(const DetectorResult& detectorResult);
-};
+		class Decoder {
+		public:
+			static DecoderResult Decode (const DetectorResult& detectorResult);
+		};
 
-} // Aztec
+	} // Aztec
 } // ZXing

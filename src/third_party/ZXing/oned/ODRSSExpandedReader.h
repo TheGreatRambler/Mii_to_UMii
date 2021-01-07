@@ -19,18 +19,17 @@
 #include "ODRowReader.h"
 
 namespace ZXing {
-namespace OneD {
+	namespace OneD {
 
-/**
+		/**
 * @author Pablo Orduña, University of Deusto(pablo.orduna@deusto.es)
 * @author Eduardo Castillejo, University of Deusto(eduardo.castillejo@deusto.es)
 */
-class RSSExpandedReader : public RowReader
-{
-public:
-	Result decodeRow(int rowNumber, const BitArray& row, std::unique_ptr<DecodingState>& state) const override;
-	Result decodePattern(int, const PatternView& row, std::unique_ptr<RowReader::DecodingState>&) const override;
-};
+		class RSSExpandedReader : public RowReader {
+		public:
+			Result decodeRow (int rowNumber, const BitArray& row, std::unique_ptr<DecodingState>& state) const override;
+			Result decodePattern (int, const PatternView& row, std::unique_ptr<RowReader::DecodingState>&) const override;
+		};
 
-} // OneD
+	} // OneD
 } // ZXing

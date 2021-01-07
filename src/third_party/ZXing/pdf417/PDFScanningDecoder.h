@@ -18,24 +18,24 @@
 
 namespace ZXing {
 
-class BitMatrix;
-class ResultPoint;
-class DecoderResult;
-template <typename T> class Nullable;
+	class BitMatrix;
+	class ResultPoint;
+	class DecoderResult;
+	template <typename T>
+	class Nullable;
 
-namespace Pdf417 {
+	namespace Pdf417 {
 
-/**
+		/**
 * @author Guenther Grau
 */
-class ScanningDecoder
-{
-public:
-	static DecoderResult Decode(const BitMatrix& image,
-		const Nullable<ResultPoint>& imageTopLeft, const Nullable<ResultPoint>& imageBottomLeft,
-		const Nullable<ResultPoint>& imageTopRight, const Nullable<ResultPoint>& imageBottomRight,
-		int minCodewordWidth, int maxCodewordWidth);
-};
+		class ScanningDecoder {
+		public:
+			static DecoderResult Decode (const BitMatrix& image,
+				const Nullable<ResultPoint>& imageTopLeft, const Nullable<ResultPoint>& imageBottomLeft,
+				const Nullable<ResultPoint>& imageTopRight, const Nullable<ResultPoint>& imageBottomRight,
+				int minCodewordWidth, int maxCodewordWidth);
+		};
 
-} // Pdf417
+	} // Pdf417
 } // ZXing

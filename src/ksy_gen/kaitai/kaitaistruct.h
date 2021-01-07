@@ -10,7 +10,7 @@ namespace kaitai {
 		kstruct (kstream* _io) {
 			m__io = _io;
 		}
-		virtual ~kstruct () { }
+		virtual ~kstruct () {}
 
 	protected:
 		kstream* m__io;
@@ -20,7 +20,6 @@ namespace kaitai {
 			return m__io;
 		}
 	};
-
 }
 
 #endif

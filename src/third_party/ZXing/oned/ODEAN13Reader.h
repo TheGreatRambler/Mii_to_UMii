@@ -19,23 +19,23 @@
 #include "ODUPCEANReader.h"
 
 namespace ZXing {
-namespace OneD {
+	namespace OneD {
 
-/**
+		/**
 * <p>Implements decoding of the EAN-13 format.</p>
 *
 * @author dswitkin@google.com (Daniel Switkin)
 * @author Sean Owen
 * @author alasdair@google.com (Alasdair Mackintosh)
 */
-class EAN13Reader : public UPCEANReader
-{
-public:
-	explicit EAN13Reader(const DecodeHints& hints) : UPCEANReader(hints) {}
+		class EAN13Reader : public UPCEANReader {
+		public:
+			explicit EAN13Reader (const DecodeHints& hints)
+				: UPCEANReader (hints) {}
 
-	BarcodeFormat expectedFormat() const override;
-	BitArray::Range decodeMiddle(const BitArray& row, BitArray::Iterator begin, std::string& resultString) const override;
-};
+			BarcodeFormat expectedFormat () const override;
+			BitArray::Range decodeMiddle (const BitArray& row, BitArray::Iterator begin, std::string& resultString) const override;
+		};
 
-} // OneD
+	} // OneD
 } // ZXing

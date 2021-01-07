@@ -17,34 +17,33 @@
 */
 
 #include "Reader.h"
-#include <vector>
 #include <memory>
+#include <vector>
 
 namespace ZXing {
 
-class DecodeHints;
+	class DecodeHints;
 
-namespace OneD {
+	namespace OneD {
 
-class RowReader;
+		class RowReader;
 
-/**
+		/**
 * @author dswitkin@google.com (Daniel Switkin)
 * @author Sean Owen
 */
-class Reader : public ZXing::Reader
-{
-public:
-	explicit Reader(const DecodeHints& hints);
-    ~Reader() override;
+		class Reader : public ZXing::Reader {
+		public:
+			explicit Reader (const DecodeHints& hints);
+			~Reader () override;
 
-	Result decode(const BinaryBitmap& image) const override;
+			Result decode (const BinaryBitmap& image) const override;
 
-private:
-	std::vector<std::unique_ptr<RowReader>> _readers;
-	bool _tryHarder;
-	bool _tryRotate;
-};
+		private:
+			std::vector<std::unique_ptr<RowReader>> _readers;
+			bool _tryHarder;
+			bool _tryRotate;
+		};
 
-} // OneD
+	} // OneD
 } // ZXing

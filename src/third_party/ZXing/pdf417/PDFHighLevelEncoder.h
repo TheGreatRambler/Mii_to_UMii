@@ -21,21 +21,20 @@
 
 namespace ZXing {
 
-enum class CharacterSet;
+	enum class CharacterSet;
 
-namespace Pdf417 {
+	namespace Pdf417 {
 
-enum class Compaction;
+		enum class Compaction;
 
-/**
+		/**
 * PDF417 high-level encoder following the algorithm described in ISO/IEC 15438:2001(E) in
 * annex P.
 */
-class HighLevelEncoder
-{
-public:
-	static std::vector<int> EncodeHighLevel(const std::wstring& msg, Compaction compaction, CharacterSet encoding);
-};
+		class HighLevelEncoder {
+		public:
+			static std::vector<int> EncodeHighLevel (const std::wstring& msg, Compaction compaction, CharacterSet encoding);
+		};
 
-} // Pdf417
+	} // Pdf417
 } // ZXing

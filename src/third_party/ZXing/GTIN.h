@@ -21,27 +21,25 @@
 #include <string>
 
 namespace ZXing {
-namespace GTIN {
+	namespace GTIN {
 
-template <typename T>
-T ComputeCheckDigit(const std::basic_string<T>& digits, bool skipTail = false)
-{
-	int sum = 0, N = Size(digits) - skipTail;
-	for (int i = N - 1; i >= 0; i -= 2)
-		sum += digits[i] - '0';
-	sum *= 3;
-	for (int i = N - 2; i >= 0; i -= 2)
-		sum += digits[i] - '0';
-	return ((10 - (sum % 10)) % 10) + '0';
-}
+		template <typename T>
+		T ComputeCheckDigit (const std::basic_string<T>& digits, bool skipTail = false) {
+			int sum = 0, N = Size (digits) - skipTail;
+			for (int i = N - 1; i >= 0; i -= 2)
+				sum += digits[i] - '0';
+			sum *= 3;
+			for (int i = N - 2; i >= 0; i -= 2)
+				sum += digits[i] - '0';
+			return ((10 - (sum % 10)) % 10) + '0';
+		}
 
-template <typename T>
-bool IsCheckDigitValid(const std::basic_string<T>& s)
-{
-	return ComputeCheckDigit(s, true) == s.back();
-}
+		template <typename T>
+		bool IsCheckDigitValid (const std::basic_string<T>& s) {
+			return ComputeCheckDigit (s, true) == s.back ();
+		}
 
-//TODO: move EANManufacturerSupport code here
+		//TODO: move EANManufacturerSupport code here
 
-} // namespace GTIN
+	} // namespace GTIN
 } // namespace ZXing

@@ -19,22 +19,21 @@
 #include <array>
 
 namespace ZXing {
-namespace QRCode {
+	namespace QRCode {
 
-/**
+		/**
 * <p>Encapsualtes the parameters for one error-correction block in one symbol version.
 * This includes the number of data codewords, and the number of times a block with these
 * parameters is used consecutively in the QR code version's format.</p>
 *
 * @author Sean Owen
 */
-struct ECB
-{
-	int count;
-	int dataCodewords;
-};
+		struct ECB {
+			int count;
+			int dataCodewords;
+		};
 
-/**
+		/**
 * <p>Encapsulates a set of error-correction blocks in one symbol version. Most versions will
 * use blocks of differing sizes within one version, so, this encapsulates the parameters for
 * each set of blocks. It also holds the number of error-correction codewords per block since it
@@ -42,29 +41,27 @@ struct ECB
 *
 * @author Sean Owen
 */
-struct ECBlocks
-{
-	int codewordsPerBlock;
-	std::array<ECB, 2> blocks;
+		struct ECBlocks {
+			int codewordsPerBlock;
+			std::array<ECB, 2> blocks;
 
-	int numBlocks() const {
-		return blocks[0].count + blocks[1].count;
-	}
+			int numBlocks () const {
+				return blocks[0].count + blocks[1].count;
+			}
 
-	int totalCodewords() const {
-		return codewordsPerBlock * numBlocks();
-	}
+			int totalCodewords () const {
+				return codewordsPerBlock * numBlocks ();
+			}
 
-	int totalDataCodewords() const {
-		return blocks[0].count * (blocks[0].dataCodewords + codewordsPerBlock)
-			+ blocks[1].count * (blocks[1].dataCodewords + codewordsPerBlock);
-	}
+			int totalDataCodewords () const {
+				return blocks[0].count * (blocks[0].dataCodewords + codewordsPerBlock)
+					   + blocks[1].count * (blocks[1].dataCodewords + codewordsPerBlock);
+			}
 
-	const std::array<ECB, 2>& blockArray() const {
-		return blocks;
-	}
-};
+			const std::array<ECB, 2>& blockArray () const {
+				return blocks;
+			}
+		};
 
-
-} // QRCode
+	} // QRCode
 } // ZXing

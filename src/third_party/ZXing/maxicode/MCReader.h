@@ -20,18 +20,17 @@
 
 namespace ZXing {
 
-class DecodeHints;
+	class DecodeHints;
 
-namespace MaxiCode {
+	namespace MaxiCode {
 
-class Reader : public ZXing::Reader
-{
-	bool _isPure;
+		class Reader : public ZXing::Reader {
+			bool _isPure;
 
-public:
-	explicit Reader(const DecodeHints& hints);
-	Result decode(const BinaryBitmap& image) const override;
-};
+		public:
+			explicit Reader (const DecodeHints& hints);
+			Result decode (const BinaryBitmap& image) const override;
+		};
 
-} // MaxiCode
+	} // MaxiCode
 } // ZXing

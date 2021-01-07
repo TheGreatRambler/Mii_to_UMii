@@ -32,12 +32,11 @@
 **
 ****************************************************************************/
 
-#include <vector>
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
+#include <vector>
 
-class KRTextDecoder
-{
+class KRTextDecoder {
 public:
-	static void AppendEucKr(std::vector<uint16_t>& utf16, const uint8_t* bytes, size_t length);
+	static void AppendEucKr (std::vector<uint16_t>& utf16, const uint8_t* bytes, size_t length);
 };

@@ -17,48 +17,46 @@
 */
 
 namespace ZXing {
-namespace QRCode {
+	namespace QRCode {
 
-class Version;
+		class Version;
 
-/**
+		/**
 * <p>See ISO 18004:2006, 6.4.1, Tables 2 and 3. This enum encapsulates the various modes in which
 * data can be encoded to bits in the QR code standard.</p>
 *
 * @author Sean Owen
 */
-class CodecMode
-{
-public:
-	enum Mode
-	{
-		TERMINATOR = 0x00, // Not really a mode...
-		NUMERIC = 0x01,
-		ALPHANUMERIC = 0x02,
-		STRUCTURED_APPEND = 0x03,
-		BYTE = 0x04,
-		FNC1_FIRST_POSITION = 0x05,
-		ECI = 0x07, // character counts don't apply
-		KANJI = 0x08,
-		FNC1_SECOND_POSITION = 0x09,
-		/** See GBT 18284-2000; "Hanzi" is a transliteration of this mode name. */
-		HANZI = 0x0D,
-	};
+		class CodecMode {
+		public:
+			enum Mode {
+				TERMINATOR           = 0x00, // Not really a mode...
+				NUMERIC              = 0x01,
+				ALPHANUMERIC         = 0x02,
+				STRUCTURED_APPEND    = 0x03,
+				BYTE                 = 0x04,
+				FNC1_FIRST_POSITION  = 0x05,
+				ECI                  = 0x07, // character counts don't apply
+				KANJI                = 0x08,
+				FNC1_SECOND_POSITION = 0x09,
+				/** See GBT 18284-2000; "Hanzi" is a transliteration of this mode name. */
+				HANZI = 0x0D,
+			};
 
-	/**
+			/**
 	* @param bits four bits encoding a QR Code data mode
 	* @return Mode encoded by these bits
 	* @throws IllegalArgumentException if bits do not correspond to a known mode
 	*/
-	static Mode ModeForBits(int bits);
+			static Mode ModeForBits (int bits);
 
-	/**
+			/**
 	* @param version version in question
 	* @return number of bits used, in this QR Code symbol {@link Version}, to encode the
 	*         count of characters that will follow encoded in this Mode
 	*/
-	static int CharacterCountBits(Mode mode, const Version& version);
-};
+			static int CharacterCountBits (Mode mode, const Version& version);
+		};
 
-} // QRCode
+	} // QRCode
 } // ZXing
