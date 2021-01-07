@@ -10,3 +10,6 @@ compile_commands.json
 *.mii
 *.yml
 lib
+*.3dsmii
+*.jpg
+*.temp
