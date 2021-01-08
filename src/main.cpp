@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <cxxopts.hpp>
 #include <exception>
 #include <filesystem>
 #include <fmt/core.h>
@@ -16,8 +17,6 @@
 #include <memory>
 #include <stb_image.h>
 #include <string>
-
-#include "third_party/cxxopts.hpp"
 
 #include "ksy_gen/kaitai/exceptions.h"
 #include "ksy_gen/kaitai/kaitaistream.h"
@@ -369,15 +368,10 @@ int main (int argc, char* argv[]) {
 			memcpy (nonceExtended, nonce, sizeof (nonce));
 			memset (&nonceExtended[8], 0, 4);
 
-			//AES_ctx ctx;
-			//AES_init_ctx_iv (&ctx, aesKey, nonceExtended);
-			//AES_CBC_decrypt_buffer (&ctx, &binPtr[8], 88);
-
-			// populate key and iv with the correct values
-
-			CryptoPP::CCM<CryptoPP::AES, 2>::Decryption d;
+			// Tag value of 4 is technically incorrect, but the last 4 bytes comprise only padding and a checksum, so it doesn't matter too much
+			CryptoPP::CCM<CryptoPP::AES, 4>::Decryption d;
 			d.SetKeyWithIV (aesKey, sizeof (aesKey), nonceExtended, sizeof (nonceExtended));
-			d.SpecifyDataLengths (0, 86, 0);
+			d.SpecifyDataLengths (0, 84, 0);
 
 			CryptoPP::ArraySource (&binPtr[8], 88, true,
 				new CryptoPP::AuthenticatedDecryptionFilter (d, new CryptoPP::ArraySink (&binPtr[8], 88), CryptoPP::AuthenticatedDecryptionFilter::Flags::MAC_AT_END));
