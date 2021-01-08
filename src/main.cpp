@@ -271,6 +271,9 @@ int main (int argc, char* argv[]) {
 		("x,verbose", "Verbose output")
 		("b,binary", "Output binary file")
 		("v,version", "Print verson")
+		("m,mod", "If specified, create mod folder with this name", cxxopts::value<std::string>())
+		("mp,mod-path", "Specify root folder of mod", cxxopts::value<std::string>()->default_value("."))
+		("r,romfs", "Path to ROMFS dump", cxxopts::value<std::string>())
 		("h,help", "Print usage");
 	// clang-format on
 
@@ -293,6 +296,20 @@ int main (int argc, char* argv[]) {
 		puts ("| Input file must be specified");
 		return -1;
 	}
+
+	std::string modName;
+	std::filesystem::path modBumiiPath;
+
+	/*
+	if (commandLineResult.count ("mod")) {
+		modName              = commandLineResult["mod"].as<std::string> ();
+		std::string rootPath = commandLineResult["mod-path"].as<std::string> ();
+		modBumiiPath         = std::filesystem::path (rootPath);
+		// https://gamebanana.com/tuts/13415
+		modBumiiPath.append (fmt::format ("{}/01007EF00011E000/romfs/Actor/UMii", modName));
+		std::filesystem::create_directories (modBumiiPath);
+	}
+	*/
 
 	// User has to quote wildcard on Windows for it to pass correctly
 	std::string inputFileString = commandLineResult["input"].as<std::string> ();
@@ -393,8 +410,12 @@ int main (int argc, char* argv[]) {
 				return -1;
 			}
 		} else {
-			std::string withoutExtension = std::filesystem::path (inputPath).replace_extension ("").string ();
-			outputFile                   = fmt::format ("{}{}", withoutExtension, outputAsBinary ? ".bumii" : ".umii.yml");
+			if (modName.empty ()) {
+				std::string withoutExtension = inputPath.replace_extension ("").string ();
+				outputFile                   = fmt::format ("{}{}", withoutExtension, outputAsBinary ? ".bumii" : ".umii.yml");
+			} else {
+				outputFile = fmt::format ("{}/{}.bumii", modBumiiPath.string (), inputPath.filename ());
+			}
 		}
 
 		if (!std::filesystem::exists (inputPath)) {
@@ -853,7 +874,7 @@ int main (int argc, char* argv[]) {
 		outfile.write (generatedUmii.c_str (), generatedUmii.size ());
 		outfile.close ();
 
-		if (outputAsBinary) {
+		if (outputAsBinary || !modName.empty ()) {
 			std::string commandLine = fmt::format ("yml_to_aamp {} {}", outputFile, outputFile);
 
 			if (isVerbose) {
