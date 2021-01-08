@@ -26,7 +26,15 @@ CFLAGS := -std=c11
 CXXFLAGS := -std=gnu++17
 
 # C/C++ flags
-CPPFLAGS := -Wall -Wno-maybe-uninitialized -Wno-sign-compare -Wno-switch-enum -Wno-switch -Wno-deprecated-declarations -DKS_STR_ENCODING_NONE $(shell pkg-config --cflags fmt) -I./include -I./src/third_party
+CPPFLAGS := -Wall -Wno-maybe-uninitialized -Wno-sign-compare -Wno-switch-enum -Wno-switch -Wno-deprecated-declarations -DKS_STR_ENCODING_NONE -DCPPGLOB_BUILDING $(shell pkg-config --cflags fmt libcurl) -I./include -I./src/third_party
+
+# Linker flags
+LDFLAGS := $(shell pkg-config --libs fmt libcurl) -L./lib -lpthread
+
+ifeq ($(UNAME),Msys)
+	# Needed for sockets on windows
+	LDFLAGS += -lws2_32
+endif
 
 ifeq ($(BUILD),release)
 	# "Release" build - optimization, and no debug symbols
@@ -34,13 +42,6 @@ ifeq ($(BUILD),release)
 else
 	# "Debug" build - no optimization, and debugging symbols
 	CPPFLAGS += -Og -g -ggdb -DDEBUG
-endif
-
-LDFLAGS := $(shell pkg-config --libs fmt) -L./lib -lpthread
-
-ifeq ($(UNAME),Msys)
-	# Needed for sockets on windows
-	LDFLAGS += -lws2_32
 endif
 
 ifeq ($(UNAME),Msys)

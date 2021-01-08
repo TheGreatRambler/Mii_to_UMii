@@ -1,11 +1,36 @@
 #define STB_IMAGE_IMPLEMENTATION
 
+// clang-format off
+#define ARRAY_FAILSAFE(assignmentProcedure, name) \
+	try { \
+		assignmentProcedure \
+	} catch (std::out_of_range& e) { \
+		puts (fmt::format ( \
+			"| " name " is ill formed: {}", \
+		data.face_color ()).c_str ()); \
+		if (isVerbose) { \
+			puts (fmt::format ("| UMii output so far: \n\n{}\n", getStringifiedUmii (info)).c_str ()); \
+		} \
+		return 0; \
+	}
+// clang-format on
+
+// Disable automatic wildcard globbing on MinGW
+// Doesn't work too well
+#ifdef __MINGW32__
+int _CRT_glob   = 0;
+int _dowildcard = 0;
+#endif
+
 #include <ZXing/ReadBarcode.h>
 #include <ZXing/TextUtfEncoding.h>
 #include <cryptopp/aes.h>
 #include <cryptopp/ccm.h>
 #include <cryptopp/filters.h>
+#include <curl/curl.h>
 #include <cstdint>
+//#include <cppglob/glob.hpp>
+#include <glob.hpp>
 #include <cstdio>
 #include <cstdlib>
 #include <cxxopts.hpp>
@@ -242,7 +267,7 @@ int main (int argc, char* argv[]) {
 	commandLineOptions.add_options()
 		("i,input", "Input file", cxxopts::value<std::string>())
 		("o,output", "Output file", cxxopts::value<std::string>())
-		("t,type", "Input Mii type (wii/3ds/wiiu/miitomo/switch/switchgame/studio)", cxxopts::value<std::string>()->default_value("wii"))
+		("t,type", "Input Mii type (wii/3ds/wiiu/miitomo/switch/switchgame/studio)", cxxopts::value<std::string>())
 		("x,verbose", "Verbose output")
 		("b,binary", "Output binary file")
 		("v,version", "Print verson")
@@ -264,443 +289,584 @@ int main (int argc, char* argv[]) {
 		return 0;
 	}
 
-	std::string inputType = commandLineResult["type"].as<std::string> ();
-	std::string inputFile = commandLineResult["input"].as<std::string> ();
-	std::string outputFile;
-	std::filesystem::path inputPath (inputFile);
-	if (commandLineResult.count ("output")) {
-		outputFile = commandLineResult["output"].as<std::string> ();
-	} else {
-		outputFile = fmt::format ("{}{}", inputPath.stem ().string (), outputAsBinary ? ".bumii" : ".umii.yml");
+	if (!commandLineResult.count ("input")) {
+		puts ("| Input file must be specified");
+		return -1;
 	}
 
-	if (!std::filesystem::exists (inputPath)) {
-		// clang-format off
-		puts (fmt::format (
-			"| Input file {} does not exist, aborting",
-		inputFile).c_str ());
-		// clang-format on
-		return 3;
-	}
+	// User has to quote wildcard on Windows for it to pass correctly
+	std::string inputFileString = commandLineResult["input"].as<std::string> ();
+	std::vector<std::filesystem::path> inputFileEntries;
+	if (inputFileString.find ("https://") != std::string::npos || inputFileString.find ("http://") != std::string::npos) {
+		// URL
+		std::string filename = HELPERS::splitString (HELPERS::splitString (inputFileString, '/').back (), '?').front ();
 
-	if (isVerbose) {
-		// clang-format off
-		puts (fmt::format (
-			"| MIITOUMII v{} copyright TheGreatRambler\n"
-			"| Input type: {}\n"
-			"| Input file: {}\n"
-			"| Input file size: {}\n"
-			"| Output file: {}",
-		programVersion, inputType, inputFile, std::filesystem::file_size(inputPath), outputFile).c_str ());
-		// clang-format on
-	}
+		if (isVerbose) {
+			puts (fmt::format ("| Remote URL filename: {}", filename).c_str ());
+		}
 
-	std::istream* is;
+		CURL* curl = curl_easy_init ();
+		if (curl) {
+			FILE* fp = fopen (filename.c_str (), "wb");
+			curl_easy_setopt (curl, CURLOPT_URL, inputFileString.c_str ());
+			curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, [] (void* ptr, size_t size, size_t nmemb, FILE* stream) {
+				size_t written = fwrite (ptr, size, nmemb, stream);
+				return written;
+			});
+			curl_easy_setopt (curl, CURLOPT_WRITEDATA, fp);
+			curl_easy_setopt (curl, CURLOPT_SSL_VERIFYPEER, 0L);
+			CURLcode res = curl_easy_perform (curl);
+			curl_easy_cleanup (curl);
+			fclose (fp);
 
-	std::string inputFileExtension = std::filesystem::path (inputFile).extension ().string ();
-	if (inputFileExtension == ".png" || inputFileExtension == ".jpg" || inputFileExtension == ".jpeg") {
-		if (inputType == "3ds" || inputType == "wiiu" || inputType == "miitomo") {
-			// Unsupported for now
-			// puts ("| QR codes are unsupported for now");
-			// return 0;
-
-			ZXing::DecodeHints qrHints;
-			qrHints.setFormats (ZXing::BarcodeFormat::QR_CODE);
-
-			int width, height, channels;
-			std::unique_ptr<stbi_uc, void (*) (void*)> buffer (stbi_load (inputFile.c_str (), &width, &height, &channels, 4), stbi_image_free);
-
-			ZXing::Result result         = ZXing::ReadBarcode ({ buffer.get (), width, height, ZXing::ImageFormat::RGBX }, qrHints);
-			ZXing::ByteArray bin         = result.metadata ().getByteArrayList (ZXing::ResultMetadata::BYTE_SEGMENTS).front ();
-			ZXing::DecodeStatus qrStatus = result.status ();
-
-			std::string qrCodeCountry = HELPERS::wstringToString (result.metadata ().getString (ZXing::ResultMetadata::POSSIBLE_COUNTRY));
-
-			uint8_t* binPtr = bin.data ();
-
-			if (isVerbose) {
+			if (res != CURLcode::CURLE_OK) {
 				// clang-format off
 				puts (fmt::format (
-					"| QR size: {}\n"
-					"| QR status: {}\n"
-					"| QR in hex:",
-				bin.size(), ZXing::ToString(qrStatus)).c_str ());
+					"| CURL failed downloading file with error {}",
+				curl_easy_strerror(res)).c_str ());
 				// clang-format on
-
-				static const int charactersPerLine = 50;
-
-				std::string hexString = HELPERS::bytesToHexString (bin.data (), bin.size ());
-				size_t stringLength   = hexString.length ();
-				for (int index = 0; index < stringLength; index += charactersPerLine) {
-					bool atEnd = index + charactersPerLine > stringLength;
-					// clang-format off
-					puts (fmt::format (
-						"     {}",
-					hexString.substr(index, atEnd ? std::string::npos : charactersPerLine)).c_str ());
-					// clang-format on
-				}
+				return -1;
 			}
 
-			static uint8_t aesKey[16] = {
-				0x59,
-				0xFC,
-				0x81,
-				0x7E,
-				0x64,
-				0x46,
-				0xEA,
-				0x61,
-				0x90,
-				0x34,
-				0x7B,
-				0x20,
-				0xE9,
-				0xBD,
-				0xCE,
-				0x52
-			};
-
-			uint8_t nonce[8];
-			memcpy (nonce, binPtr, sizeof (nonce));
-
-			uint8_t nonceExtended[12];
-			memcpy (nonceExtended, nonce, sizeof (nonce));
-			memset (&nonceExtended[8], 0, 4);
-
-			// Tag value of 4 is technically incorrect, but the last 4 bytes comprise only padding and a checksum, so it doesn't matter too much
-			CryptoPP::CCM<CryptoPP::AES, 4>::Decryption d;
-			d.SetKeyWithIV (aesKey, sizeof (aesKey), nonceExtended, sizeof (nonceExtended));
-			d.SpecifyDataLengths (0, 84, 0);
-
-			CryptoPP::ArraySource (&binPtr[8], 88, true,
-				new CryptoPP::AuthenticatedDecryptionFilter (d, new CryptoPP::ArraySink (&binPtr[8], 88), CryptoPP::AuthenticatedDecryptionFilter::Flags::MAC_AT_END));
-
-			uint8_t* decodedMii = (uint8_t*)malloc (96);
-
-			memcpy (decodedMii, &binPtr[8], 12);
-			memcpy (&decodedMii[12], nonce, sizeof (nonce));
-			memcpy (&decodedMii[20], &binPtr[20], 76);
-
-			if (isVerbose) {
-				// clang-format off
-				puts (fmt::format (
-					"| Decoded QR size: {}\n"
-					"| Decoded QR in hex:",
-				96).c_str ());
-				// clang-format on
-
-				static const int charactersPerLine = 50;
-
-				std::string hexString = HELPERS::bytesToHexString (decodedMii, 96);
-				size_t stringLength   = hexString.length ();
-				for (int index = 0; index < stringLength; index += charactersPerLine) {
-					bool atEnd = index + charactersPerLine > stringLength;
-					// clang-format off
-					puts (fmt::format (
-						"     {}",
-					hexString.substr(index, atEnd ? std::string::npos : charactersPerLine)).c_str ());
-					// clang-format on
-				}
-			}
-
-			is = new HELPERS::IMemStream (decodedMii, 96);
+			inputFileEntries.push_back (std::filesystem::path (filename));
 		} else {
-			puts ("| QR codes are only supported in the wiiu/wiiu/miitomo types");
+			puts ("| CURL failed with an error");
 			return -1;
 		}
 	} else {
-		is = new std::ifstream (inputFile, std::ifstream::binary);
+		inputFileEntries = glob::rglob (inputFileString);
 	}
-
-	kaitai::kstream* ks;
-
-	try {
-		ks = new kaitai::kstream (is);
-	} catch (kaitai::kstruct_error& e) {
-		// clang-format off
-		puts (fmt::format (
-			"| Kaitai exception: {}",
-		e.what()).c_str ());
-		// clang-format on
-	}
-
-	Mii::MiiInfo info;
-
-	if (inputType == "3ds" || inputType == "wiiu" || inputType == "miitomo") {
-		Kaitai::gen2_wiiu_3ds_miitomo_t data (ks);
-		info.name               = data.mii_name ();
-		info.creator            = data.creator_name ();
-		info.body_height        = (int)(data.body_height () / 42.33);
-		info.body_weight        = (int)(data.body_weight () / 42.33);
-		info.personal_fav_color = data.favorite_color ();
-
-		try {
-			info.shape_skin_color = Mii::SkinTone.at (data.face_color ());
-		} catch (std::out_of_range& e) {
-			// clang-format off
-			puts (fmt::format (
-				"| Skin color is ill formed: {}",
-			data.face_color ()).c_str ());
-			// clang-format on
-			if (isVerbose) {
-				puts (fmt::format ("| UMii output so far: \n\n{}\n", getStringifiedUmii (info)).c_str ());
-			}
-			return 0;
-		}
-
-		info.shape_make       = data.face_makeup ();
-		info.shape_wrinkle    = data.face_wrinkles ();
-		info.hair_type        = data.hair_type ();
-		info.hair_flip        = data.hair_flip ();
-		info.hair_color       = data.hair_color ();
-		info.eye_type         = data.eye_type ();
-		info.eyebrow_type     = data.eyebrow_type ();
-		info.nose_type        = data.nose_type ();
-		info.mouth_type       = data.mouth_type ();
-		info.beard_type       = data.facial_hair_beard ();
-		info.glass_type       = data.glasses_type ();
-		info.personal_sex_age = data.gender () == 0 ? 1 : 4;
-		info.shape_jaw        = data.face_type ();
-
-		try {
-			info.eye_rotate = (float)data.eye_rotation () - Mii::EyeRotBase.at (info.eye_type);
-		} catch (std::out_of_range& e) {
-			// clang-format off
-			puts (fmt::format (
-				"| Eye type is ill formed: {}",
-			info.eye_type).c_str ());
-			// clang-format on
-			if (isVerbose) {
-				puts (fmt::format ("| UMii output so far: \n\n{}\n", getStringifiedUmii (info)).c_str ());
-			}
-			return 0;
-		}
-
-		try {
-			info.eyebrow_rotate = (float)data.eyebrow_rotation () - Mii::EyebrowRotBase.at (info.eyebrow_type);
-		} catch (std::out_of_range& e) {
-			// clang-format off
-			puts (fmt::format (
-				"| Eyebrow type is ill formed: {}",
-			info.eyebrow_type).c_str ());
-			// clang-format on
-			if (isVerbose) {
-				puts (fmt::format ("| UMii output so far: \n\n{}\n", getStringifiedUmii (info)).c_str ());
-			}
-			return 0;
-		}
-
-		info.personal_personality = data.gender () == 0 ? "Man_Normal" : "Woman_Normal";
-		info.personal_voice_type  = data.gender () == 0 ? "Hylia_Man_Young_Normal03" : "Hylia_Woman_Young_Normal04";
-	} else if (inputType == "switch") {
-		Kaitai::gen3_switch_t data (ks);
-		info.name                 = data.mii_name ();
-		info.hair_type            = data.hair_type ();
-		info.body_height          = (int)(data.body_height () / 42.33);
-		info.body_weight          = (int)(data.body_weight () / 42.33);
-		info.hair_flip            = data.hair_flip ();
-		info.hair_color           = data.hair_color ();
-		info.eye_color            = data.eye_color ();
-		info.eyebrow_color        = data.eyebrow_color ();
-		info.mouth_color          = data.mouth_color ();
-		info.hair_color           = data.facial_hair_color ();
-		info.glass_color          = data.glasses_color ();
-		info.eye_type             = data.eye_type ();
-		info.mouth_type           = data.mouth_type ();
-		info.eye_trans_v          = (float)data.eye_vertical ();
-		info.beard_mustache       = data.facial_hair_mustache ();
-		info.eyebrow_type         = data.eyebrow_type ();
-		info.beard_type           = data.facial_hair_beard ();
-		info.nose_type            = data.nose_type ();
-		info.mouth_scale          = (float)data.mouth_stretch ();
-		info.nose_trans_v         = (float)data.nose_vertical ();
-		info.eyebrow_scale        = (float)data.eyebrow_stretch ();
-		info.mouth_trans_v        = (float)data.mouth_vertical ();
-		info.eye_rotate           = (float)data.eye_rotation ();
-		info.eye_scale            = (float)data.eye_stretch ();
-		info.eye_scale            = (float)data.eye_size ();
-		info.glass_type           = data.glasses_type ();
-		info.personal_fav_color   = data.favorite_color ();
-		info.shape_wrinkle        = data.face_wrinkles ();
-		info.shape_skin_color     = Mii::SkinTone.at (data.face_color ());
-		info.eye_trans_u          = (float)data.eye_horizontal ();
-		info.shape_make           = data.face_makeup ();
-		info.eyebrow_scale        = (float)data.eyebrow_size ();
-		info.eyebrow_trans_v      = (float)data.eyebrow_vertical () - 3.0;
-		info.eyebrow_trans_u      = (float)data.eyebrow_horizontal ();
-		info.mouth_scale          = (float)data.mouth_size ();
-		info.nose_scale           = (float)data.nose_size ();
-		info.beard_scale          = (float)data.facial_hair_size ();
-		info.shape_jaw            = data.face_type ();
-		info.eye_rotate           = (float)data.eye_rotation () - Mii::EyeRotBase.at (info.eye_type);
-		info.eyebrow_rotate       = (float)data.eyebrow_rotation () - Mii::EyebrowRotBase.at (info.eyebrow_type);
-		info.personal_personality = data.gender () == 0 ? "Man_Normal" : "Woman_Normal";
-		info.personal_voice_type  = data.gender () == 0 ? "Hylia_Man_Young_Normal03" : "Hylia_Woman_Young_Normal04";
-	} else if (inputType == "switchgame") {
-		Kaitai::gen3_switchgame_t data (ks);
-		info.name                 = data.mii_name ();
-		info.personal_fav_color   = data.favorite_color ();
-		info.personal_sex_age     = data.gender () == 0 ? 1 : 4;
-		info.body_height          = (int)(data.body_height () / 42.33);
-		info.body_weight          = (int)(data.body_weight () / 42.33);
-		info.shape_skin_color     = Mii::SkinTone.at (data.face_color ());
-		info.shape_wrinkle        = data.face_wrinkles ();
-		info.shape_make           = data.face_makeup ();
-		info.hair_type            = data.hair_type ();
-		info.hair_flip            = data.hair_flip ();
-		info.hair_color           = data.hair_color ();
-		info.eye_color            = data.eye_color ();
-		info.eyebrow_color        = data.eyebrow_color ();
-		info.mouth_color          = data.mouth_color ();
-		info.beard_color          = data.facial_hair_color ();
-		info.glass_color          = data.glasses_color ();
-		info.eye_type             = data.eye_type ();
-		info.mouth_type           = data.mouth_type ();
-		info.eye_scale            = (float)data.eye_size ();
-		info.eye_aspect           = (float)data.eye_stretch ();
-		info.eye_trans_u          = (float)data.eye_horizontal ();
-		info.eye_trans_v          = (float)data.eye_vertical ();
-		info.eyebrow_scale        = (float)data.eyebrow_size ();
-		info.eyebrow_aspect       = (float)data.eyebrow_stretch ();
-		info.eyebrow_trans_u      = (float)data.eyebrow_horizontal ();
-		info.eyebrow_trans_v      = (float)data.eyebrow_vertical () - 3.0;
-		info.nose_scale           = (float)data.nose_size ();
-		info.nose_trans_v         = (float)data.nose_vertical ();
-		info.mouth_scale          = (float)data.mouth_size ();
-		info.mouth_aspect         = (float)data.mouth_stretch ();
-		info.mouth_trans_v        = (float)data.mouth_vertical ();
-		info.beard_scale          = (float)data.facial_hair_size ();
-		info.beard_mustache       = data.facial_hair_mustache ();
-		info.eyebrow_type         = data.eyebrow_type ();
-		info.beard_type           = data.facial_hair_beard ();
-		info.nose_type            = data.nose_type ();
-		info.glass_type           = data.glasses_type ();
-		info.personal_fav_color   = data.favorite_color ();
-		info.shape_wrinkle        = data.face_wrinkles ();
-		info.shape_make           = data.face_makeup ();
-		info.shape_jaw            = data.face_type ();
-		info.eye_rotate           = (float)data.eye_rotation () - Mii::EyeRotBase.at (info.eye_type);
-		info.eyebrow_rotate       = (float)data.eyebrow_rotation () - Mii::EyebrowRotBase.at (info.eyebrow_type);
-		info.personal_personality = data.gender () == 0 ? "Man_Normal" : "Woman_Normal";
-		info.personal_voice_type  = data.gender () == 0 ? "Hylia_Man_Young_Normal03" : "Hylia_Woman_Young_Normal04";
-	} else if (inputType == "studio") {
-		Kaitai::gen3_studio_t data (ks);
-		info.personal_fav_color   = data.favorite_color ();
-		info.personal_sex_age     = data.gender () == 0 ? 1 : 4;
-		info.body_height          = (int)(data.body_height () / 42.33);
-		info.body_weight          = (int)(data.body_weight () / 42.33);
-		info.shape_skin_color     = Mii::SkinTone.at (data.face_color ());
-		info.shape_wrinkle        = data.face_wrinkles ();
-		info.shape_make           = data.face_makeup ();
-		info.hair_type            = data.hair_type ();
-		info.hair_flip            = data.hair_flip ();
-		info.hair_color           = data.hair_color ();
-		info.eye_color            = data.eye_color ();
-		info.eyebrow_color        = data.eyebrow_color ();
-		info.mouth_color          = data.mouth_color ();
-		info.beard_color          = data.facial_hair_color ();
-		info.glass_color          = data.glasses_color ();
-		info.eye_type             = data.eye_type ();
-		info.mouth_type           = data.mouth_type ();
-		info.eye_scale            = (float)data.eye_size ();
-		info.eye_aspect           = (float)data.eye_stretch ();
-		info.eye_trans_u          = (float)data.eye_horizontal ();
-		info.eye_trans_v          = (float)data.eye_vertical ();
-		info.eyebrow_scale        = (float)data.eyebrow_size ();
-		info.eyebrow_aspect       = (float)data.eyebrow_stretch ();
-		info.eyebrow_trans_u      = (float)data.eyebrow_horizontal ();
-		info.eyebrow_trans_v      = (float)data.eyebrow_vertical () - 3.0;
-		info.nose_scale           = (float)data.nose_size ();
-		info.nose_trans_v         = (float)data.nose_vertical ();
-		info.mouth_scale          = (float)data.mouth_size ();
-		info.mouth_aspect         = (float)data.mouth_stretch ();
-		info.mouth_trans_v        = (float)data.mouth_vertical ();
-		info.beard_scale          = (float)data.beard_size ();
-		info.beard_mustache       = data.beard_mustache ();
-		info.eyebrow_type         = data.eyebrow_type ();
-		info.beard_type           = data.beard_goatee ();
-		info.nose_type            = data.nose_type ();
-		info.glass_type           = data.glasses_type ();
-		info.personal_fav_color   = data.favorite_color ();
-		info.shape_wrinkle        = data.face_wrinkles ();
-		info.shape_make           = data.face_makeup ();
-		info.shape_jaw            = data.face_type ();
-		info.eye_rotate           = (float)data.eye_rotation () - Mii::EyeRotBase.at (info.eye_type);
-		info.eyebrow_rotate       = (float)data.eyebrow_rotation () - Mii::EyebrowRotBase.at (info.eyebrow_type);
-		info.personal_personality = data.gender () == 0 ? "Man_Normal" : "Woman_Normal";
-		info.personal_voice_type  = data.gender () == 0 ? "Hylia_Man_Young_Normal03" : "Hylia_Woman_Young_Normal04";
-	} else {
-		// Wii
-		Kaitai::gen1_wii_t data (ks);
-		info.name                 = data.mii_name ();
-		info.creator              = data.creator_name ();
-		info.personal_sex_age     = data.gender () == 0 ? 1 : 4;
-		info.creator              = data.creator_name ();
-		info.personal_fav_color   = data.favorite_color ();
-		info.body_height          = (int)(data.body_height () / 42.33);
-		info.body_weight          = (int)(data.body_weight () / 42.33);
-		info.shape_skin_color     = Mii::SkinTone.at (data.face_color ());
-		info.beard_type           = data.facial_feature ();
-		info.hair_type            = data.hair_type ();
-		info.hair_color           = data.hair_color ();
-		info.hair_flip            = data.hair_flip ();
-		info.eyebrow_type         = data.eyebrow_type ();
-		info.eyebrow_color        = data.eyebrow_color ();
-		info.eye_type             = data.eye_type ();
-		info.eye_color            = data.eye_color ();
-		info.nose_type            = data.nose_type ();
-		info.mouth_type           = data.mouth_type ();
-		info.mouth_color          = data.mouth_color ();
-		info.glass_type           = data.glasses_type ();
-		info.glass_color          = data.glasses_color ();
-		info.eyebrow_trans_v      = (float)data.eyebrow_vertical () - 3.0;
-		info.eyebrow_scale        = (float)data.eyebrow_size ();
-		info.eyebrow_trans_u      = (float)data.eyebrow_horizontal ();
-		info.eye_trans_v          = (float)data.eye_vertical ();
-		info.eye_scale            = (float)data.eye_size ();
-		info.eye_trans_u          = (float)data.eye_horizontal ();
-		info.nose_scale           = (float)data.nose_size ();
-		info.nose_trans_v         = (float)data.nose_vertical ();
-		info.mouth_scale          = (float)data.mouth_size ();
-		info.mouth_trans_v        = (float)data.mouth_vertical ();
-		info.beard_mustache       = data.facial_hair_mustache ();
-		info.beard_type           = data.facial_hair_beard ();
-		info.beard_color          = data.facial_hair_color ();
-		info.beard_scale          = (float)data.facial_hair_size ();
-		info.shape_jaw            = data.face_type ();
-		info.eye_rotate           = (float)data.eye_rotation () - Mii::EyeRotBase.at (info.eye_type);
-		info.eyebrow_rotate       = (float)data.eyebrow_rotation () - Mii::EyebrowRotBase.at (info.eyebrow_type);
-		info.personal_personality = data.gender () == 0 ? "Man_Normal" : "Woman_Normal";
-		info.personal_voice_type  = data.gender () == 0 ? "Hylia_Man_Young_Normal03" : "Hylia_Woman_Young_Normal04";
-	}
-
-	delete ks;
-	delete is;
-
-	std::string generatedUmii = getStringifiedUmii (info);
 
 	if (isVerbose) {
-		puts (fmt::format ("| UMii output: \n\n{}\n", generatedUmii).c_str ());
+		// clang-format off
+		puts (fmt::format (
+			"| Input string: {}\n"
+			"| Files in glob:",
+		inputFileString).c_str ());
+		// clang-format on
+		for (auto& inputPath : inputFileEntries) {
+			// clang-format off
+			puts (fmt::format (
+				"    {}",
+			inputPath.string()).c_str ());
+			// clang-format on
+		}
 	}
 
-	std::ofstream outfile (outputFile);
-
-	if (!outfile.is_open ()) {
-		puts (fmt::format ("Output file {} did not open\n", outputFile).c_str ());
+	if (inputFileEntries.size () == 0) {
+		puts ("| No files to process, exiting");
 	}
 
-	outfile.write (generatedUmii.c_str (), generatedUmii.size ());
-	outfile.close ();
+	for (auto& inputPath : inputFileEntries) {
+		std::string inputType;
+		std::string inputFileExtension = inputPath.extension ().string ();
 
-	if (outputAsBinary) {
-		std::string commandLine = fmt::format ("yml_to_aamp {} {}", outputFile, outputFile);
-
-		if (isVerbose) {
-			puts ("| Generating UMii as Binary AAMP");
-			puts (fmt::format ("| {}", commandLine).c_str ());
+		if (commandLineResult.count ("type")) {
+			inputType = commandLineResult["type"].as<std::string> ();
+		} else {
+			// Infer from extension
+			try {
+				inputType = Mii::InferMiiType.at (inputFileExtension);
+				if (isVerbose) {
+					// clang-format off
+					puts (fmt::format (
+						"| Type {} inferred from path {}",
+					inputType, inputPath.string()).c_str ());
+					// clang-format on
+				}
+			} catch (std::out_of_range& e) {
+				// clang-format off
+				puts (fmt::format (
+					"| Extension cannot be inferred from path {}",
+				inputFileExtension).c_str ());
+				// clang-format on
+				return -1;
+			}
 		}
 
-		HELPERS::exec (commandLine.c_str ());
+		std::string outputFile;
+		if (commandLineResult.count ("output")) {
+			if (inputFileEntries.size () == 1) {
+				outputFile = commandLineResult["output"].as<std::string> ();
+			} else {
+				puts ("| Output path can only be specified when one file is being processed");
+				return -1;
+			}
+		} else {
+			std::string withoutExtension = std::filesystem::path (inputPath).replace_extension ("").string ();
+			outputFile                   = fmt::format ("{}{}", withoutExtension, outputAsBinary ? ".bumii" : ".umii.yml");
+		}
+
+		if (!std::filesystem::exists (inputPath)) {
+			// clang-format off
+			puts (fmt::format (
+				"| Input file {} does not exist, aborting",
+			inputPath.string()).c_str ());
+			// clang-format on
+			return 3;
+		}
+
+		if (isVerbose) {
+			// clang-format off
+			puts (fmt::format (
+				"| MIITOUMII v{} copyright TheGreatRambler\n"
+				"| Input type: {}\n"
+				"| Input file: {}\n"
+				"| Input file size: {}\n"
+				"| Output file: {}",
+			programVersion, inputType, inputPath.string(), std::filesystem::file_size(inputPath), outputFile).c_str ());
+			// clang-format on
+		}
+
+		std::istream* is;
+
+		if (inputFileExtension == ".jpg" || inputFileExtension == ".jpeg" || inputFileExtension == ".png" || inputFileExtension == ".tga" || inputFileExtension == ".bmp" || inputFileExtension == ".gif") {
+			if (inputType == "3ds" || inputType == "wiiu" || inputType == "miitomo") {
+				ZXing::DecodeHints qrHints;
+				qrHints.setFormats (ZXing::BarcodeFormat::QR_CODE);
+
+				int width, height, channels;
+				std::unique_ptr<stbi_uc, void (*) (void*)> buffer (stbi_load (inputPath.string ().c_str (), &width, &height, &channels, 4), stbi_image_free);
+
+				ZXing::Result result         = ZXing::ReadBarcode ({ buffer.get (), width, height, ZXing::ImageFormat::RGBX }, qrHints);
+				ZXing::ByteArray bin         = result.metadata ().getByteArrayList (ZXing::ResultMetadata::BYTE_SEGMENTS).front ();
+				ZXing::DecodeStatus qrStatus = result.status ();
+
+				if (qrStatus != ZXing::DecodeStatus::NoError) {
+					puts (fmt::format ("| QR couldn't be decoded with status {}, aborting", ZXing::ToString (qrStatus)).c_str ());
+					return -1;
+				}
+
+				std::string qrCodeCountry = HELPERS::wstringToString (result.metadata ().getString (ZXing::ResultMetadata::POSSIBLE_COUNTRY));
+
+				uint8_t* binPtr = bin.data ();
+
+				if (isVerbose) {
+					// clang-format off
+					puts (fmt::format (
+						"| QR size: {}\n"
+						"| QR in hex:",
+					bin.size()).c_str ());
+					// clang-format on
+
+					static const int charactersPerLine = 50;
+
+					std::string hexString = HELPERS::bytesToHexString (bin.data (), bin.size ());
+					size_t stringLength   = hexString.length ();
+					for (int index = 0; index < stringLength; index += charactersPerLine) {
+						bool atEnd = index + charactersPerLine > stringLength;
+						// clang-format off
+						puts (fmt::format (
+							"     {}",
+						hexString.substr(index, atEnd ? std::string::npos : charactersPerLine)).c_str ());
+						// clang-format on
+					}
+				}
+
+				static uint8_t aesKey[16] = {
+					0x59,
+					0xFC,
+					0x81,
+					0x7E,
+					0x64,
+					0x46,
+					0xEA,
+					0x61,
+					0x90,
+					0x34,
+					0x7B,
+					0x20,
+					0xE9,
+					0xBD,
+					0xCE,
+					0x52
+				};
+
+				uint8_t nonce[8];
+				memcpy (nonce, binPtr, sizeof (nonce));
+
+				uint8_t nonceExtended[12];
+				memcpy (nonceExtended, nonce, sizeof (nonce));
+				memset (&nonceExtended[8], 0, 4);
+
+				// Tag value of 4 is technically incorrect, but the last 4 bytes comprise only padding and a checksum, so it doesn't matter too much
+				CryptoPP::CCM<CryptoPP::AES, 4>::Decryption d;
+				d.SetKeyWithIV (aesKey, sizeof (aesKey), nonceExtended, sizeof (nonceExtended));
+				d.SpecifyDataLengths (0, 84, 0);
+
+				CryptoPP::ArraySource (&binPtr[8], 88, true,
+					new CryptoPP::AuthenticatedDecryptionFilter (d, new CryptoPP::ArraySink (&binPtr[8], 88), CryptoPP::AuthenticatedDecryptionFilter::Flags::MAC_AT_END));
+
+				uint8_t* decodedMii = (uint8_t*)malloc (96);
+
+				memcpy (decodedMii, &binPtr[8], 12);
+				memcpy (&decodedMii[12], nonce, sizeof (nonce));
+				memcpy (&decodedMii[20], &binPtr[20], 76);
+
+				if (isVerbose) {
+					// clang-format off
+					puts (fmt::format (
+						"| Decoded QR size: {}\n"
+						"| Decoded QR in hex:",
+					96).c_str ());
+					// clang-format on
+
+					static const int charactersPerLine = 50;
+
+					std::string hexString = HELPERS::bytesToHexString (decodedMii, 96);
+					size_t stringLength   = hexString.length ();
+					for (int index = 0; index < stringLength; index += charactersPerLine) {
+						bool atEnd = index + charactersPerLine > stringLength;
+						// clang-format off
+						puts (fmt::format (
+							"     {}",
+						hexString.substr(index, atEnd ? std::string::npos : charactersPerLine)).c_str ());
+						// clang-format on
+					}
+				}
+
+				is = new HELPERS::IMemStream (decodedMii, 96);
+			} else {
+				puts ("| QR codes are only supported in the wiiu/wiiu/miitomo types");
+				return -1;
+			}
+		} else {
+			is = new std::ifstream (inputPath, std::ifstream::binary);
+		}
+
+		kaitai::kstream* ks;
+
+		try {
+			ks = new kaitai::kstream (is);
+		} catch (kaitai::kstruct_error& e) {
+			// clang-format off
+			puts (fmt::format (
+				"| Kaitai exception: {}",
+			e.what()).c_str ());
+			// clang-format on
+		}
+
+		Mii::MiiInfo info;
+
+		if (inputType == "3ds" || inputType == "wiiu" || inputType == "miitomo") {
+			Kaitai::gen2_wiiu_3ds_miitomo_t data (ks);
+			info.name               = data.mii_name ();
+			info.creator            = data.creator_name ();
+			info.body_height        = (int)(data.body_height () / 63.5);
+			info.body_weight        = (int)(data.body_weight () / 42.33);
+			info.personal_fav_color = data.favorite_color ();
+
+			info.shape_make       = data.face_makeup ();
+			info.shape_wrinkle    = data.face_wrinkles ();
+			info.hair_type        = data.hair_type ();
+			info.hair_flip        = data.hair_flip ();
+			info.hair_color       = data.hair_color ();
+			info.eye_type         = data.eye_type ();
+			info.eyebrow_type     = data.eyebrow_type ();
+			info.nose_type        = data.nose_type ();
+			info.mouth_type       = data.mouth_type ();
+			info.beard_type       = data.facial_hair_beard ();
+			info.glass_type       = data.glasses_type ();
+			info.personal_sex_age = data.gender () == 0 ? 1 : 4;
+			info.shape_jaw        = data.face_type ();
+			info.eye_color        = data.eye_color ();
+			info.beard_mustache   = data.facial_hair_mustache ();
+			info.eyebrow_scale    = (float)data.eyebrow_size ();
+			info.eyebrow_trans_v  = (float)data.eyebrow_vertical () - 3.0;
+			info.eyebrow_trans_u  = (float)data.eyebrow_horizontal ();
+			info.mouth_scale      = (float)data.mouth_size ();
+			info.nose_scale       = (float)data.nose_size ();
+			info.beard_scale      = (float)data.facial_hair_size ();
+			info.eye_trans_u      = (float)data.eye_horizontal ();
+			info.mouth_scale      = (float)data.mouth_stretch ();
+			info.nose_trans_v     = (float)data.nose_vertical ();
+			info.eyebrow_aspect   = (float)data.eyebrow_stretch ();
+			info.mouth_trans_v    = (float)data.mouth_vertical ();
+			info.eye_rotate       = (float)data.eye_rotation ();
+			info.eye_aspect       = (float)data.eye_stretch ();
+			info.eye_scale        = (float)data.eye_size ();
+			info.eye_trans_v      = (float)data.eye_vertical ();
+			info.mouth_scale      = (float)data.mouth_size ();
+			info.mouth_aspect     = (float)data.mouth_stretch ();
+			info.eyebrow_color    = data.eyebrow_color ();
+			info.glass_color      = data.glasses_color ();
+
+			info.personal_personality = data.gender () == 0 ? "Man_Normal" : "Woman_Normal";
+			info.personal_voice_type  = data.gender () == 0 ? "Hylia_Man_Young_Normal03" : "Hylia_Woman_Young_Normal04";
+
+			ARRAY_FAILSAFE ({
+				info.shape_skin_color = Mii::SkinTone.at (data.face_color ());
+			},
+				"Skin color")
+
+			ARRAY_FAILSAFE ({
+				info.eye_rotate = (float)data.eye_rotation () - Mii::EyeRotBase.at (info.eye_type);
+			},
+				"Eye type")
+
+			ARRAY_FAILSAFE ({
+				info.eyebrow_rotate = (float)data.eyebrow_rotation () - Mii::EyebrowRotBase.at (info.eyebrow_type);
+			},
+				"Eyebrow type")
+		} else if (inputType == "switch") {
+			Kaitai::gen3_switch_t data (ks);
+			info.name                 = data.mii_name ();
+			info.body_height          = (int)(data.body_height () / 63.5);
+			info.body_weight          = (int)(data.body_weight () / 42.33);
+			info.personal_fav_color   = data.favorite_color ();
+			info.shape_make           = data.face_makeup ();
+			info.shape_wrinkle        = data.face_wrinkles ();
+			info.hair_type            = data.hair_type ();
+			info.hair_flip            = data.hair_flip ();
+			info.hair_color           = data.hair_color ();
+			info.eye_type             = data.eye_type ();
+			info.eyebrow_type         = data.eyebrow_type ();
+			info.nose_type            = data.nose_type ();
+			info.mouth_type           = data.mouth_type ();
+			info.beard_type           = data.facial_hair_beard ();
+			info.glass_type           = data.glasses_type ();
+			info.personal_sex_age     = data.gender () == 0 ? 1 : 4;
+			info.shape_jaw            = data.face_type ();
+			info.eye_color            = data.eye_color ();
+			info.beard_mustache       = data.facial_hair_mustache ();
+			info.eyebrow_scale        = (float)data.eyebrow_size ();
+			info.eyebrow_trans_v      = (float)data.eyebrow_vertical () - 3.0;
+			info.eyebrow_trans_u      = (float)data.eyebrow_horizontal ();
+			info.mouth_scale          = (float)data.mouth_size ();
+			info.nose_scale           = (float)data.nose_size ();
+			info.beard_scale          = (float)data.facial_hair_size ();
+			info.eye_trans_u          = (float)data.eye_horizontal ();
+			info.mouth_scale          = (float)data.mouth_stretch ();
+			info.nose_trans_v         = (float)data.nose_vertical ();
+			info.eyebrow_aspect       = (float)data.eyebrow_stretch ();
+			info.mouth_trans_v        = (float)data.mouth_vertical ();
+			info.eye_rotate           = (float)data.eye_rotation ();
+			info.eye_aspect           = (float)data.eye_stretch ();
+			info.eye_scale            = (float)data.eye_size ();
+			info.eye_trans_v          = (float)data.eye_vertical ();
+			info.mouth_scale          = (float)data.mouth_size ();
+			info.mouth_aspect         = (float)data.mouth_stretch ();
+			info.eyebrow_color        = data.eyebrow_color ();
+			info.glass_color          = data.glasses_color ();
+			info.personal_personality = data.gender () == 0 ? "Man_Normal" : "Woman_Normal";
+			info.personal_voice_type  = data.gender () == 0 ? "Hylia_Man_Young_Normal03" : "Hylia_Woman_Young_Normal04";
+
+			ARRAY_FAILSAFE ({
+				info.shape_skin_color = Mii::SkinTone.at (data.face_color ());
+			},
+				"Skin color")
+
+			ARRAY_FAILSAFE ({
+				info.eye_rotate = (float)data.eye_rotation () - Mii::EyeRotBase.at (info.eye_type);
+			},
+				"Eye type")
+
+			ARRAY_FAILSAFE ({
+				info.eyebrow_rotate = (float)data.eyebrow_rotation () - Mii::EyebrowRotBase.at (info.eyebrow_type);
+			},
+				"Eyebrow type")
+		} else if (inputType == "switchgame") {
+			Kaitai::gen3_switchgame_t data (ks);
+			info.name                 = data.mii_name ();
+			info.body_height          = (int)(data.body_height () / 63.5);
+			info.body_weight          = (int)(data.body_weight () / 42.33);
+			info.personal_fav_color   = data.favorite_color ();
+			info.shape_make           = data.face_makeup ();
+			info.shape_wrinkle        = data.face_wrinkles ();
+			info.hair_type            = data.hair_type ();
+			info.hair_flip            = data.hair_flip ();
+			info.hair_color           = data.hair_color ();
+			info.eye_type             = data.eye_type ();
+			info.eyebrow_type         = data.eyebrow_type ();
+			info.nose_type            = data.nose_type ();
+			info.mouth_type           = data.mouth_type ();
+			info.beard_type           = data.facial_hair_beard ();
+			info.glass_type           = data.glasses_type ();
+			info.personal_sex_age     = data.gender () == 0 ? 1 : 4;
+			info.shape_jaw            = data.face_type ();
+			info.eye_color            = data.eye_color ();
+			info.beard_mustache       = data.facial_hair_mustache ();
+			info.eyebrow_scale        = (float)data.eyebrow_size ();
+			info.eyebrow_trans_v      = (float)data.eyebrow_vertical () - 3.0;
+			info.eyebrow_trans_u      = (float)data.eyebrow_horizontal ();
+			info.mouth_scale          = (float)data.mouth_size ();
+			info.nose_scale           = (float)data.nose_size ();
+			info.beard_scale          = (float)data.facial_hair_size ();
+			info.eye_trans_u          = (float)data.eye_horizontal ();
+			info.mouth_scale          = (float)data.mouth_stretch ();
+			info.nose_trans_v         = (float)data.nose_vertical ();
+			info.eyebrow_aspect       = (float)data.eyebrow_stretch ();
+			info.mouth_trans_v        = (float)data.mouth_vertical ();
+			info.eye_rotate           = (float)data.eye_rotation ();
+			info.eye_aspect           = (float)data.eye_stretch ();
+			info.eye_scale            = (float)data.eye_size ();
+			info.eye_trans_v          = (float)data.eye_vertical ();
+			info.mouth_scale          = (float)data.mouth_size ();
+			info.mouth_aspect         = (float)data.mouth_stretch ();
+			info.eyebrow_color        = data.eyebrow_color ();
+			info.glass_color          = data.glasses_color ();
+			info.personal_personality = data.gender () == 0 ? "Man_Normal" : "Woman_Normal";
+			info.personal_voice_type  = data.gender () == 0 ? "Hylia_Man_Young_Normal03" : "Hylia_Woman_Young_Normal04";
+
+			ARRAY_FAILSAFE ({
+				info.shape_skin_color = Mii::SkinTone.at (data.face_color ());
+			},
+				"Skin color")
+
+			ARRAY_FAILSAFE ({
+				info.eye_rotate = (float)data.eye_rotation () - Mii::EyeRotBase.at (info.eye_type);
+			},
+				"Eye type")
+
+			ARRAY_FAILSAFE ({
+				info.eyebrow_rotate = (float)data.eyebrow_rotation () - Mii::EyebrowRotBase.at (info.eyebrow_type);
+			},
+				"Eyebrow type")
+		} else if (inputType == "studio") {
+			Kaitai::gen3_studio_t data (ks);
+			info.body_height          = (int)(data.body_height () / 63.5);
+			info.body_weight          = (int)(data.body_weight () / 42.33);
+			info.personal_fav_color   = data.favorite_color ();
+			info.shape_make           = data.face_makeup ();
+			info.shape_wrinkle        = data.face_wrinkles ();
+			info.hair_type            = data.hair_type ();
+			info.hair_flip            = data.hair_flip ();
+			info.hair_color           = data.hair_color ();
+			info.eye_type             = data.eye_type ();
+			info.eyebrow_type         = data.eyebrow_type ();
+			info.nose_type            = data.nose_type ();
+			info.mouth_type           = data.mouth_type ();
+			info.beard_type           = data.beard_goatee ();
+			info.glass_type           = data.glasses_type ();
+			info.personal_sex_age     = data.gender () == 0 ? 1 : 4;
+			info.shape_jaw            = data.face_type ();
+			info.eye_color            = data.eye_color ();
+			info.beard_mustache       = data.beard_mustache ();
+			info.eyebrow_scale        = (float)data.eyebrow_size ();
+			info.eyebrow_trans_v      = (float)data.eyebrow_vertical () - 3.0;
+			info.eyebrow_trans_u      = (float)data.eyebrow_horizontal ();
+			info.mouth_scale          = (float)data.mouth_size ();
+			info.nose_scale           = (float)data.nose_size ();
+			info.beard_scale          = (float)data.beard_size ();
+			info.eye_trans_u          = (float)data.eye_horizontal ();
+			info.mouth_scale          = (float)data.mouth_stretch ();
+			info.nose_trans_v         = (float)data.nose_vertical ();
+			info.eyebrow_aspect       = (float)data.eyebrow_stretch ();
+			info.mouth_trans_v        = (float)data.mouth_vertical ();
+			info.eye_rotate           = (float)data.eye_rotation ();
+			info.eye_aspect           = (float)data.eye_stretch ();
+			info.eye_scale            = (float)data.eye_size ();
+			info.eye_trans_v          = (float)data.eye_vertical ();
+			info.mouth_scale          = (float)data.mouth_size ();
+			info.mouth_aspect         = (float)data.mouth_stretch ();
+			info.eyebrow_color        = data.eyebrow_color ();
+			info.glass_color          = data.glasses_color ();
+			info.personal_personality = data.gender () == 0 ? "Man_Normal" : "Woman_Normal";
+			info.personal_voice_type  = data.gender () == 0 ? "Hylia_Man_Young_Normal03" : "Hylia_Woman_Young_Normal04";
+
+			ARRAY_FAILSAFE ({
+				info.shape_skin_color = Mii::SkinTone.at (data.face_color ());
+			},
+				"Skin color")
+
+			ARRAY_FAILSAFE ({
+				info.eye_rotate = (float)data.eye_rotation () - Mii::EyeRotBase.at (info.eye_type);
+			},
+				"Eye type")
+
+			ARRAY_FAILSAFE ({
+				info.eyebrow_rotate = (float)data.eyebrow_rotation () - Mii::EyebrowRotBase.at (info.eyebrow_type);
+			},
+				"Eyebrow type")
+		} else {
+			// Wii
+			Kaitai::gen1_wii_t data (ks);
+			info.name                 = data.mii_name ();
+			info.creator              = data.creator_name ();
+			info.personal_sex_age     = data.gender () == 0 ? 1 : 4;
+			info.creator              = data.creator_name ();
+			info.personal_fav_color   = data.favorite_color ();
+			info.body_height          = (int)(data.body_height () / 63.5);
+			info.body_weight          = (int)(data.body_weight () / 42.33);
+			info.beard_type           = data.facial_feature ();
+			info.hair_type            = data.hair_type ();
+			info.hair_color           = data.hair_color ();
+			info.hair_flip            = data.hair_flip ();
+			info.eyebrow_type         = data.eyebrow_type ();
+			info.eyebrow_color        = data.eyebrow_color ();
+			info.eye_type             = data.eye_type ();
+			info.eye_color            = data.eye_color ();
+			info.nose_type            = data.nose_type ();
+			info.mouth_type           = data.mouth_type ();
+			info.mouth_color          = data.mouth_color ();
+			info.glass_type           = data.glasses_type ();
+			info.glass_color          = data.glasses_color ();
+			info.eyebrow_trans_v      = (float)data.eyebrow_vertical () - 3.0;
+			info.eyebrow_scale        = (float)data.eyebrow_size ();
+			info.eyebrow_trans_u      = (float)data.eyebrow_horizontal ();
+			info.eye_trans_v          = (float)data.eye_vertical ();
+			info.eye_scale            = (float)data.eye_size ();
+			info.eye_trans_u          = (float)data.eye_horizontal ();
+			info.nose_scale           = (float)data.nose_size ();
+			info.nose_trans_v         = (float)data.nose_vertical ();
+			info.mouth_scale          = (float)data.mouth_size ();
+			info.mouth_trans_v        = (float)data.mouth_vertical ();
+			info.beard_mustache       = data.facial_hair_mustache ();
+			info.beard_type           = data.facial_hair_beard ();
+			info.beard_color          = data.facial_hair_color ();
+			info.beard_scale          = (float)data.facial_hair_size ();
+			info.shape_jaw            = data.face_type ();
+			info.personal_personality = data.gender () == 0 ? "Man_Normal" : "Woman_Normal";
+			info.personal_voice_type  = data.gender () == 0 ? "Hylia_Man_Young_Normal03" : "Hylia_Woman_Young_Normal04";
+
+			ARRAY_FAILSAFE ({
+				info.shape_skin_color = Mii::SkinTone.at (data.face_color ());
+			},
+				"Skin color")
+
+			ARRAY_FAILSAFE ({
+				info.eye_rotate = (float)data.eye_rotation () - Mii::EyeRotBase.at (info.eye_type);
+			},
+				"Eye type")
+
+			ARRAY_FAILSAFE ({
+				info.eyebrow_rotate = (float)data.eyebrow_rotation () - Mii::EyebrowRotBase.at (info.eyebrow_type);
+			},
+				"Eyebrow type")
+		}
+
+		delete ks;
+		delete is;
+
+		std::string generatedUmii = getStringifiedUmii (info);
+
+		if (isVerbose) {
+			puts (fmt::format ("| UMii output: \n\n{}\n", generatedUmii).c_str ());
+		}
+
+		std::ofstream outfile (outputFile);
+
+		if (!outfile.is_open ()) {
+			puts (fmt::format ("Output file {} did not open\n", outputFile).c_str ());
+		}
+
+		outfile.write (generatedUmii.c_str (), generatedUmii.size ());
+		outfile.close ();
+
+		if (outputAsBinary) {
+			std::string commandLine = fmt::format ("yml_to_aamp {} {}", outputFile, outputFile);
+
+			if (isVerbose) {
+				puts ("| Generating UMii as Binary AAMP");
+				puts (fmt::format ("| {}", commandLine).c_str ());
+			}
+
+			HELPERS::exec (commandLine.c_str ());
+		}
+
+		if (isVerbose) {
+			puts (fmt::format ("| Written output file {}", outputFile).c_str ());
+		}
 	}
 
 	return 0;
