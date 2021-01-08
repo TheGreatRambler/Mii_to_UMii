@@ -295,7 +295,7 @@ int main (int argc, char* argv[]) {
 		// clang-format on
 	}
 
-	std::ifstream* is;
+	std::istream* is;
 
 	std::string inputFileExtension = std::filesystem::path (inputFile).extension ().string ();
 	if (inputFileExtension == ".png" || inputFileExtension == ".jpg" || inputFileExtension == ".jpeg") {
@@ -323,9 +323,8 @@ int main (int argc, char* argv[]) {
 				puts (fmt::format (
 					"| QR size: {}\n"
 					"| QR status: {}\n"
-					"| QR country: {}\n"
 					"| QR in hex:",
-				bin.size(), ZXing::ToString(qrStatus), qrCodeCountry).c_str ());
+				bin.size(), ZXing::ToString(qrStatus)).c_str ());
 				// clang-format on
 
 				static const int charactersPerLine = 50;
@@ -358,7 +357,7 @@ int main (int argc, char* argv[]) {
 				0xE9,
 				0xBD,
 				0xCE,
-				0x52,
+				0x52
 			};
 
 			uint8_t nonce[8];
@@ -376,37 +375,23 @@ int main (int argc, char* argv[]) {
 			CryptoPP::ArraySource (&binPtr[8], 88, true,
 				new CryptoPP::AuthenticatedDecryptionFilter (d, new CryptoPP::ArraySink (&binPtr[8], 88), CryptoPP::AuthenticatedDecryptionFilter::Flags::MAC_AT_END));
 
-			std::string tempName = fmt::format ("{}.temp", inputFile);
-
-			if (isVerbose) {
-				// clang-format off
-				puts (fmt::format (
-					"| Temporary name: {}",
-				tempName).c_str ());
-				// clang-format on
-			}
-
-			uint8_t decodedMii[96];
+			uint8_t* decodedMii = (uint8_t*)malloc (96);
 
 			memcpy (decodedMii, &binPtr[8], 12);
 			memcpy (&decodedMii[12], nonce, sizeof (nonce));
 			memcpy (&decodedMii[20], &binPtr[20], 76);
 
-			FILE* output = fopen (tempName.c_str (), "wb");
-			fwrite (decodedMii, sizeof (decodedMii), 1, output);
-			fclose (output);
-
 			if (isVerbose) {
 				// clang-format off
 				puts (fmt::format (
-					"| File size: {}\n"
+					"| Decoded QR size: {}\n"
 					"| Decoded QR in hex:",
-				sizeof(decodedMii)).c_str ());
+				96).c_str ());
 				// clang-format on
 
 				static const int charactersPerLine = 50;
 
-				std::string hexString = HELPERS::bytesToHexString (decodedMii, sizeof (decodedMii));
+				std::string hexString = HELPERS::bytesToHexString (decodedMii, 96);
 				size_t stringLength   = hexString.length ();
 				for (int index = 0; index < stringLength; index += charactersPerLine) {
 					bool atEnd = index + charactersPerLine > stringLength;
@@ -418,7 +403,7 @@ int main (int argc, char* argv[]) {
 				}
 			}
 
-			is = new std::ifstream (tempName, std::ifstream::binary);
+			is = new HELPERS::IMemStream (decodedMii, 96);
 		} else {
 			puts ("| QR codes are only supported in the wiiu/wiiu/miitomo types");
 			return -1;
@@ -443,10 +428,11 @@ int main (int argc, char* argv[]) {
 
 	if (inputType == "3ds" || inputType == "wiiu" || inputType == "miitomo") {
 		Kaitai::gen2_wiiu_3ds_miitomo_t data (ks);
-		info.name        = data.mii_name ();
-		info.creator     = data.creator_name ();
-		info.body_height = (int)(data.body_height () / 42.33);
-		info.body_weight = (int)(data.body_weight () / 42.33);
+		info.name               = data.mii_name ();
+		info.creator            = data.creator_name ();
+		info.body_height        = (int)(data.body_height () / 42.33);
+		info.body_weight        = (int)(data.body_weight () / 42.33);
+		info.personal_fav_color = data.favorite_color ();
 
 		try {
 			info.shape_skin_color = Mii::SkinTone.at (data.face_color ());

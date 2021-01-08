@@ -23,10 +23,10 @@ endif
 CFLAGS := -std=c11
 
 # C++ flags
-CXXFLAGS := -std=gnu++17 $(shell pkg-config --cflags fmt) -I./include -I./src/third_party
+CXXFLAGS := -std=gnu++17
 
 # C/C++ flags
-CPPFLAGS := -Wall -Wno-maybe-uninitialized -Wno-sign-compare -Wno-switch-enum -Wno-switch -Wno-deprecated-declarations -DKS_STR_ENCODING_NONE
+CPPFLAGS := -Wall -Wno-maybe-uninitialized -Wno-sign-compare -Wno-switch-enum -Wno-switch -Wno-deprecated-declarations -DKS_STR_ENCODING_NONE $(shell pkg-config --cflags fmt) -I./include -I./src/third_party
 
 ifeq ($(BUILD),release)
 	# "Release" build - optimization, and no debug symbols
@@ -36,18 +36,26 @@ else
 	CPPFLAGS += -Og -g -ggdb -DDEBUG
 endif
 
-LDFLAGS := $(shell pkg-config --libs fmt) -L./lib -lpthread -lZXing -lcryptopp
+LDFLAGS := $(shell pkg-config --libs fmt) -L./lib -lpthread
+
 ifeq ($(UNAME),Msys)
 	# Needed for sockets on windows
 	LDFLAGS += -lws2_32
+endif
+
+ifeq ($(UNAME),Msys)
+	CPPFLAGS += -I./lib
+	LDFLAGS += -lZXing -lcryptopp;
+else
+	CPPFLAGS += $(shell pkg-config --cflags zxing libcrypto++)
+	LDFLAGS += $(shell pkg-config --libs zxing libcrypto++)
 endif
 
 ifeq ($(ARCH),32)
 	CPPFLAGS += -m32
 	LDFLAGS += -m32
 else
-	CPPFLAGS += -m64
-	LDFLAGS += -m64
+	CXXFLAGS += 
 endif
 
 ifeq ($(UNAME),Msys)
