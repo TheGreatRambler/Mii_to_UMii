@@ -10,4 +10,6 @@ Maintainer: TheGreatRambler
 Description: Convert Mii files to UMii files
 Depends: libfmt7 (= 7.1.3+ds1-5),
 	libzxingcore1 (= 1.1.1-2),
-	libcrypto++8 (= 8.4.0-1)
+	libcrypto++8 (= 8.4.0-1),
+	libyaml (= 0.1.7),
+	zlib1g (= 1:1.2.8.dfsg-5)
