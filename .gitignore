@@ -9,7 +9,7 @@ compile_commands.json
 *.bumii
 *.mii
 *.yml
-lib
+# lib
 *.3dsmii
 *.jpg
 *.temp

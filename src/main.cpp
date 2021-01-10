@@ -22,14 +22,17 @@ int _CRT_glob   = 0;
 int _dowildcard = 0;
 #endif
 
-#include <ZXing/ReadBarcode.h>
-#include <ZXing/TextUtfEncoding.h>
-#include <cryptopp/aes.h>
-#include <cryptopp/ccm.h>
-#include <cryptopp/filters.h>
+#include <ReadBarcode.h>
+#include <TextUtfEncoding.h>
+#include <aes.h>
+#include <ccm.h>
+#include <oead/aamp.h>
+#include <oead/yaz0.h>
+#include <oead/sarc.h>
+#include <filters.h>
+#include <unordered_map>
 #include <curl/curl.h>
 #include <cstdint>
-//#include <cppglob/glob.hpp>
 #include <glob.hpp>
 #include <cstdio>
 #include <cstdlib>
@@ -271,9 +274,9 @@ int main (int argc, char* argv[]) {
 		("x,verbose", "Verbose output")
 		("b,binary", "Output binary file")
 		("v,version", "Print verson")
-		("m,mod", "If specified, create mod folder with this name", cxxopts::value<std::string>())
-		("mp,mod-path", "Specify root folder of mod", cxxopts::value<std::string>()->default_value("."))
+		("p,mod-path", "Specify root folder of mod", cxxopts::value<std::string>()->default_value("."))
 		("r,romfs", "Path to ROMFS dump", cxxopts::value<std::string>())
+		("d,delete-actor-folder", "Delete automatically generated actor folder")
 		("h,help", "Print usage");
 	// clang-format on
 
@@ -296,20 +299,6 @@ int main (int argc, char* argv[]) {
 		puts ("| Input file must be specified");
 		return -1;
 	}
-
-	std::string modName;
-	std::filesystem::path modBumiiPath;
-
-	/*
-	if (commandLineResult.count ("mod")) {
-		modName              = commandLineResult["mod"].as<std::string> ();
-		std::string rootPath = commandLineResult["mod-path"].as<std::string> ();
-		modBumiiPath         = std::filesystem::path (rootPath);
-		// https://gamebanana.com/tuts/13415
-		modBumiiPath.append (fmt::format ("{}/01007EF00011E000/romfs/Actor/UMii", modName));
-		std::filesystem::create_directories (modBumiiPath);
-	}
-	*/
 
 	// User has to quote wildcard on Windows for it to pass correctly
 	std::string inputFileString = commandLineResult["input"].as<std::string> ();
@@ -354,6 +343,37 @@ int main (int argc, char* argv[]) {
 		inputFileEntries = glob::rglob (inputFileString);
 	}
 
+	for (auto& inputPath : inputFileEntries) {
+		if (!std::filesystem::exists (inputPath)) {
+			// clang-format off
+			puts (fmt::format (
+				"| Input file {} does not exist, aborting",
+			inputPath.string()).c_str ());
+			// clang-format on
+			return 3;
+		}
+	}
+
+	std::filesystem::path modActorPath;
+	std::filesystem::path romfsActorPath;
+
+	if (commandLineResult.count ("mod-path")) {
+		// Unsupported for now
+		puts ("| Modifying mods is unsupported right now");
+		return -1;
+
+		std::string rootPath = commandLineResult["mod-path"].as<std::string> ();
+		modActorPath         = std::filesystem::path (rootPath).append ("/01007EF00011E000/romfs/Actor/Pack");
+		std::filesystem::create_directories (modActorPath);
+		if (commandLineResult.count ("romfs")) {
+			std::string romfsPath = commandLineResult["romfs"].as<std::string> ();
+			romfsActorPath        = std::filesystem::path (romfsPath).append ("/Actor/Pack");
+		} else {
+			puts ("| ROMFS path not specified, aborting");
+			return -1;
+		}
+	}
+
 	if (isVerbose) {
 		// clang-format off
 		puts (fmt::format (
@@ -377,6 +397,30 @@ int main (int argc, char* argv[]) {
 	for (auto& inputPath : inputFileEntries) {
 		std::string inputType;
 		std::string inputFileExtension = inputPath.extension ().string ();
+		std::string inputFileName      = std::filesystem::path (inputPath).replace_extension ("").filename ().string ();
+
+		if (!modActorPath.empty ()) {
+			std::filesystem::path romfsPack = std::filesystem::path (romfsActorPath).append (fmt::format ("/{}.sbactorpack", inputFileName));
+			if (std::filesystem::exists (romfsPack)) {
+				std::vector<uint8_t> romfsPackBinary             = HELPERS::readFile (romfsPack.string ().c_str ());
+				std::vector<uint8_t> decompressedRomfsPackBinary = oead::yaz0::Decompress (romfsPackBinary);
+				auto filesInArchive                              = oead::Sarc (decompressedRomfsPackBinary).GetFiles ();
+				for (oead::Sarc::File file : filesInArchive) {
+					std::filesystem::path pathHere (modActorPath);
+					pathHere.append (inputFileName);
+					pathHere.append (file.name);
+					std::ofstream fileStream (pathHere, std::ofstream::binary);
+					fileStream.write ((char*)file.data.data (), file.data.size ());
+					fileStream.close ();
+				}
+			} else {
+				// clang-format off
+				puts (fmt::format (
+					"| ROMFS pack {} does not exist at {}, aborting",
+				inputFileName, romfsPack.string()).c_str ());
+				// clang-format on
+			}
+		}
 
 		if (commandLineResult.count ("type")) {
 			inputType = commandLineResult["type"].as<std::string> ();
@@ -402,29 +446,36 @@ int main (int argc, char* argv[]) {
 		}
 
 		std::string outputFile;
-		if (commandLineResult.count ("output")) {
-			if (inputFileEntries.size () == 1) {
-				outputFile = commandLineResult["output"].as<std::string> ();
+		if (modActorPath.empty ()) {
+			if (commandLineResult.count ("output")) {
+				if (inputFileEntries.size () == 1) {
+					outputFile = commandLineResult["output"].as<std::string> ();
+				} else {
+					puts ("| Output path can only be specified when one file is being processed");
+					return -1;
+				}
 			} else {
-				puts ("| Output path can only be specified when one file is being processed");
-				return -1;
+				// Will be converted to binary regardless if mod
+				std::string withoutExtension = std::filesystem::path (inputPath).replace_extension ("").string ();
+				outputFile                   = fmt::format ("{}{}", withoutExtension, outputAsBinary ? ".bumii" : ".umii.yml");
 			}
 		} else {
-			if (modName.empty ()) {
-				std::string withoutExtension = inputPath.replace_extension ("").string ();
-				outputFile                   = fmt::format ("{}{}", withoutExtension, outputAsBinary ? ".bumii" : ".umii.yml");
-			} else {
-				outputFile = fmt::format ("{}/{}.bumii", modBumiiPath.string (), inputPath.filename ());
-			}
-		}
+			std::filesystem::path pathHere (modActorPath);
+			pathHere.append (inputFileName);
+			pathHere.append ("Actor/Umii");
 
-		if (!std::filesystem::exists (inputPath)) {
-			// clang-format off
-			puts (fmt::format (
-				"| Input file {} does not exist, aborting",
-			inputPath.string()).c_str ());
-			// clang-format on
-			return 3;
+			for (auto const& file : std::filesystem::directory_iterator (pathHere)) {
+				std::filesystem::path filePath = file.path ();
+				if (filePath.extension ().string () == ".bumii") {
+					outputFile = std::filesystem::absolute (filePath).string ();
+					break;
+				}
+			}
+
+			if (outputFile.empty ()) {
+				puts ("| Chosen actor does not have any Miis, aborting");
+				return 3;
+			}
 		}
 
 		if (isVerbose) {
@@ -865,28 +916,57 @@ int main (int argc, char* argv[]) {
 			puts (fmt::format ("| UMii output: \n\n{}\n", generatedUmii).c_str ());
 		}
 
-		std::ofstream outfile (outputFile);
+		if (outputAsBinary || !modActorPath.empty ()) {
+			std::ofstream outfile (outputFile, std::ios::binary);
 
-		if (!outfile.is_open ()) {
-			puts (fmt::format ("Output file {} did not open\n", outputFile).c_str ());
-		}
-
-		outfile.write (generatedUmii.c_str (), generatedUmii.size ());
-		outfile.close ();
-
-		if (outputAsBinary || !modName.empty ()) {
-			std::string commandLine = fmt::format ("yml_to_aamp {} {}", outputFile, outputFile);
-
-			if (isVerbose) {
-				puts ("| Generating UMii as Binary AAMP");
-				puts (fmt::format ("| {}", commandLine).c_str ());
+			if (!outfile.is_open ()) {
+				puts (fmt::format ("Output file {} did not open\n", outputFile).c_str ());
 			}
 
-			HELPERS::exec (commandLine.c_str ());
+			std::vector<std::uint8_t> generatedBinary = oead::aamp::ParameterIO::FromText (generatedUmii).ToBinary ();
+			outfile.write ((char*)generatedBinary.data (), generatedBinary.size ());
+			outfile.close ();
+		} else {
+			std::ofstream outfile (outputFile);
+
+			if (!outfile.is_open ()) {
+				puts (fmt::format ("Output file {} did not open\n", outputFile).c_str ());
+			}
+
+			outfile.write (generatedUmii.c_str (), generatedUmii.size ());
+			outfile.close ();
 		}
 
 		if (isVerbose) {
 			puts (fmt::format ("| Written output file {}", outputFile).c_str ());
+		}
+
+		if (!modActorPath.empty ()) {
+			oead::SarcWriter rootSarcWriter;
+
+			std::filesystem::path modActor (modActorPath);
+			modActor.append (inputFileName);
+			for (const auto& entry : std::filesystem::recursive_directory_iterator (modActor)) {
+				std::filesystem::path relativePath = std::filesystem::relative (entry, modActor);
+
+				if (!std::filesystem::is_directory (relativePath)) {
+					rootSarcWriter.m_files[relativePath.string ()] = HELPERS::readFile (entry.path ().string ().c_str ());
+				}
+			}
+
+			std::filesystem::path outputSbactorpack (modActorPath);
+			outputSbactorpack.append (fmt::format ("/{}.sbactorpack", inputFileName));
+
+			auto writtenData                           = rootSarcWriter.Write ();
+			std::vector<uint8_t> compressedWrittenData = oead::yaz0::Compress (writtenData.second, 0, 9);
+
+			std::ofstream fileStream (outputSbactorpack, std::ofstream::binary);
+			fileStream.write ((char*)compressedWrittenData.data (), compressedWrittenData.size ());
+			fileStream.close ();
+
+			if (commandLineResult["delete-actor-folder"].as<bool> ()) {
+				std::filesystem::remove_all (std::filesystem::path (modActorPath).append (inputFileName));
+			}
 		}
 	}
 

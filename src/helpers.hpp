@@ -23,10 +23,9 @@ namespace HELPERS {
 	std::vector<std::string> splitString (const std::string s, char delim);
 	std::string joinString (std::vector<std::string> strings, std::string delimiter);
 	std::string bytesToHexString (unsigned char* info, unsigned int infoLength);
-
 	std::string exec (const char* cmd);
-
 	std::string wstringToString (std::wstring string);
+	std::vector<uint8_t> readFile (const char* filename);
 
 	struct IMemBuf : std::streambuf {
 		IMemBuf (uint8_t* base, size_t size) {

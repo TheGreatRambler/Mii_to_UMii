@@ -75,3 +75,9 @@ std::string HELPERS::wstringToString (std::wstring string) {
 	std::wstring_convert<convert_type, wchar_t> converter;
 	return converter.to_bytes (string);
 }
+
+std::vector<uint8_t> HELPERS::readFile (const char* filename) {
+	std::ifstream file (filename, std::ios::binary);
+	return std::vector<uint8_t> ((std::istreambuf_iterator<char> (file)),
+		std::istreambuf_iterator<char> ());
+}
