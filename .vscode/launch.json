@@ -11,7 +11,7 @@
 			"program": "${workspaceFolder}/bin/miitoumii.exe",
 			"args": [
 				"-i",
-				"*.jpg",
+				"3DS_Test_Female.jpg",
 				"-x"
 			],
 			"logging": {
@@ -39,12 +39,8 @@
 			"program": "${workspaceFolder}/bin/miitoumii",
 			"args": [
 				"-i",
-				"3DS_Test_Female.cfsd",
-				"-o",
-				"3DS_Test_Female1.umii.yml",
-				"-x",
-				"-t",
-				"3ds"
+				"3DS_Test_Female.jpg",
+				"-x"
 			],
 			"logging": {
 				"moduleLoad": true,

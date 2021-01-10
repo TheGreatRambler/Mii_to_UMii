@@ -35,23 +35,23 @@ LDFLAGS := $(shell pkg-config --libs fmt libcurl) -Wl,--gc-sections
 CPPFLAGS += -I./lib/cryptopp -I./lib/oead/src/include -I./lib/ZXing/core/src -I./lib/oead/lib/abseil -I./lib/oead/lib/EasyIterator/include -I./lib/oead/lib/libyaml/include -I./lib/oead/lib/nonstd -I./lib/oead/lib/ordered-map/include -I./lib/oead/lib/rapidyaml/src -I./lib/oead/lib/zlib-ng
 LDFLAGS += \
 	-L./lib/cryptopp \
-	-L./lib/oead/bin/lib/abseil/absl/base \
-	-L./lib/oead/bin/lib/abseil/absl/container \
-	-L./lib/oead/bin/lib/abseil/absl/debugging \
-	-L./lib/oead/bin/lib/abseil/absl/flags \
-	-L./lib/oead/bin/lib/abseil/absl/hash \
-	-L./lib/oead/bin/lib/abseil/absl/numeric \
-	-L./lib/oead/bin/lib/abseil/absl/random \
-	-L./lib/oead/bin/lib/abseil/absl/status \
-	-L./lib/oead/bin/lib/abseil/absl/strings \
-	-L./lib/oead/bin/lib/abseil/absl/synchronization \
-	-L./lib/oead/bin/lib/abseil/absl/time \
-	-L./lib/oead/bin/lib/abseil/absl/types \
-	-L./lib/oead/bin/lib/libyaml \
-	-L./lib/oead/bin/lib/rapidyaml \
-	-L./lib/oead/bin/lib/rapidyaml/subprojects/c4core/build \
-	-L./lib/oead/bin/lib/zlib-ng \
-	-L./lib/oead/bin \
+	-L./lib/oead/build/lib/abseil/absl/base \
+	-L./lib/oead/build/lib/abseil/absl/container \
+	-L./lib/oead/build/lib/abseil/absl/debugging \
+	-L./lib/oead/build/lib/abseil/absl/flags \
+	-L./lib/oead/build/lib/abseil/absl/hash \
+	-L./lib/oead/build/lib/abseil/absl/numeric \
+	-L./lib/oead/build/lib/abseil/absl/random \
+	-L./lib/oead/build/lib/abseil/absl/status \
+	-L./lib/oead/build/lib/abseil/absl/strings \
+	-L./lib/oead/build/lib/abseil/absl/synchronization \
+	-L./lib/oead/build/lib/abseil/absl/time \
+	-L./lib/oead/build/lib/abseil/absl/types \
+	-L./lib/oead/build/lib/libyaml \
+	-L./lib/oead/build/lib/rapidyaml \
+	-L./lib/oead/build/lib/rapidyaml/subprojects/c4core/build \
+	-L./lib/oead/build/lib/zlib-ng \
+	-L./lib/oead/build \
 	-L./lib/ZXing/bin/core \
 	-loead \
 	-loead_res \

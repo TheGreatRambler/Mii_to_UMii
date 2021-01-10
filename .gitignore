@@ -15,3 +15,4 @@ compile_commands.json
 *.temp
 *.cfsd
 *.png
+lib/ZXing_build

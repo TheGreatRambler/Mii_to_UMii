@@ -274,7 +274,7 @@ int main (int argc, char* argv[]) {
 		("x,verbose", "Verbose output")
 		("b,binary", "Output binary file")
 		("v,version", "Print verson")
-		("p,mod-path", "Specify root folder of mod", cxxopts::value<std::string>()->default_value("."))
+		("p,mod-path", "Specify root folder of mod", cxxopts::value<std::string>())
 		("r,romfs", "Path to ROMFS dump", cxxopts::value<std::string>())
 		("d,delete-actor-folder", "Delete automatically generated actor folder")
 		("h,help", "Print usage");
@@ -315,7 +315,7 @@ int main (int argc, char* argv[]) {
 		if (curl) {
 			FILE* fp = fopen (filename.c_str (), "wb");
 			curl_easy_setopt (curl, CURLOPT_URL, inputFileString.c_str ());
-			curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, [] (void* ptr, size_t size, size_t nmemb, FILE* stream) {
+			curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, [](void* ptr, size_t size, size_t nmemb, FILE* stream) {
 				size_t written = fwrite (ptr, size, nmemb, stream);
 				return written;
 			});
@@ -358,16 +358,21 @@ int main (int argc, char* argv[]) {
 	std::filesystem::path romfsActorPath;
 
 	if (commandLineResult.count ("mod-path")) {
-		// Unsupported for now
-		puts ("| Modifying mods is unsupported right now");
-		return -1;
-
 		std::string rootPath = commandLineResult["mod-path"].as<std::string> ();
-		modActorPath         = std::filesystem::path (rootPath).append ("/01007EF00011E000/romfs/Actor/Pack");
+		modActorPath         = std::filesystem::path (rootPath).append ("01007EF00011E000/romfs/Actor/Pack");
 		std::filesystem::create_directories (modActorPath);
 		if (commandLineResult.count ("romfs")) {
 			std::string romfsPath = commandLineResult["romfs"].as<std::string> ();
-			romfsActorPath        = std::filesystem::path (romfsPath).append ("/Actor/Pack");
+			romfsActorPath        = std::filesystem::path (romfsPath).append ("Actor/Pack");
+
+			if (isVerbose) {
+				// clang-format off
+				puts (fmt::format (
+					"| Mod actor folder: {}\n"
+					"| Romfs actor folder: {}",
+				modActorPath, romfsActorPath).c_str ());
+				// clang-format on
+			}
 		} else {
 			puts ("| ROMFS path not specified, aborting");
 			return -1;
@@ -400,8 +405,16 @@ int main (int argc, char* argv[]) {
 		std::string inputFileName      = std::filesystem::path (inputPath).replace_extension ("").filename ().string ();
 
 		if (!modActorPath.empty ()) {
-			std::filesystem::path romfsPack = std::filesystem::path (romfsActorPath).append (fmt::format ("/{}.sbactorpack", inputFileName));
+			std::filesystem::path romfsPack = std::filesystem::path (romfsActorPath).append (fmt::format ("{}.sbactorpack", inputFileName));
 			if (std::filesystem::exists (romfsPack)) {
+				if (isVerbose) {
+					// clang-format off
+					puts (fmt::format (
+						"| {} using sbactorpack file {}",
+					inputPath.string(), romfsPack.string()).c_str ());
+					// clang-format on
+				}
+
 				std::vector<uint8_t> romfsPackBinary             = HELPERS::readFile (romfsPack.string ().c_str ());
 				std::vector<uint8_t> decompressedRomfsPackBinary = oead::yaz0::Decompress (romfsPackBinary);
 				auto filesInArchive                              = oead::Sarc (decompressedRomfsPackBinary).GetFiles ();
@@ -409,6 +422,15 @@ int main (int argc, char* argv[]) {
 					std::filesystem::path pathHere (modActorPath);
 					pathHere.append (inputFileName);
 					pathHere.append (file.name);
+
+					if (isVerbose) {
+						// clang-format off
+						puts (fmt::format (
+							"| {} -> {}",
+						file.name, pathHere.string()).c_str ());
+						// clang-format on
+					}
+
 					std::ofstream fileStream (pathHere, std::ofstream::binary);
 					fileStream.write ((char*)file.data.data (), file.data.size ());
 					fileStream.close ();
@@ -472,6 +494,14 @@ int main (int argc, char* argv[]) {
 				}
 			}
 
+			if (isVerbose) {
+				// clang-format off
+				puts (fmt::format (
+					"| Chosen bumii file: {}",
+				outputFile).c_str ());
+				// clang-format on
+			}
+
 			if (outputFile.empty ()) {
 				puts ("| Chosen actor does not have any Miis, aborting");
 				return 3;
@@ -501,7 +531,6 @@ int main (int argc, char* argv[]) {
 				std::unique_ptr<stbi_uc, void (*) (void*)> buffer (stbi_load (inputPath.string ().c_str (), &width, &height, &channels, 4), stbi_image_free);
 
 				ZXing::Result result         = ZXing::ReadBarcode ({ buffer.get (), width, height, ZXing::ImageFormat::RGBX }, qrHints);
-				ZXing::ByteArray bin         = result.metadata ().getByteArrayList (ZXing::ResultMetadata::BYTE_SEGMENTS).front ();
 				ZXing::DecodeStatus qrStatus = result.status ();
 
 				if (qrStatus != ZXing::DecodeStatus::NoError) {
@@ -509,6 +538,7 @@ int main (int argc, char* argv[]) {
 					return -1;
 				}
 
+				ZXing::ByteArray bin      = result.metadata ().getByteArrayList (ZXing::ResultMetadata::BYTE_SEGMENTS).front ();
 				std::string qrCodeCountry = HELPERS::wstringToString (result.metadata ().getString (ZXing::ResultMetadata::POSSIBLE_COUNTRY));
 
 				uint8_t* binPtr = bin.data ();
@@ -951,21 +981,37 @@ int main (int argc, char* argv[]) {
 
 				if (!std::filesystem::is_directory (relativePath)) {
 					rootSarcWriter.m_files[relativePath.string ()] = HELPERS::readFile (entry.path ().string ().c_str ());
+
+					if (isVerbose) {
+						// clang-format off
+						puts (fmt::format (
+							"| {}: {}",
+						relativePath.string (), entry.path ().string ()).c_str ());
+						// clang-format on
+					}
 				}
 			}
 
 			std::filesystem::path outputSbactorpack (modActorPath);
-			outputSbactorpack.append (fmt::format ("/{}.sbactorpack", inputFileName));
+			outputSbactorpack.append (fmt::format ("{}.sbactorpack", inputFileName));
+
+			if (isVerbose) {
+				puts (fmt::format ().c_str ("| Writing actor file back to {}", outputSbactorpack.string ()));
+			}
 
 			auto writtenData                           = rootSarcWriter.Write ();
-			std::vector<uint8_t> compressedWrittenData = oead::yaz0::Compress (writtenData.second, 0, 9);
+			std::vector<uint8_t> compressedWrittenData = oead::yaz0::Compress (writtenData.second, writtenData.first, 9);
 
 			std::ofstream fileStream (outputSbactorpack, std::ofstream::binary);
 			fileStream.write ((char*)compressedWrittenData.data (), compressedWrittenData.size ());
 			fileStream.close ();
 
 			if (commandLineResult["delete-actor-folder"].as<bool> ()) {
-				std::filesystem::remove_all (std::filesystem::path (modActorPath).append (inputFileName));
+				std::filesystem::path folderToDelete = std::filesystem::path (modActorPath).append (inputFileName);
+				if (isVerbose) {
+					puts (fmt::format ().c_str ("| Deleting temporary actor folder {}", folderToDelete));
+				}
+				std::filesystem::remove_all (folderToDelete);
 			}
 		}
 	}
