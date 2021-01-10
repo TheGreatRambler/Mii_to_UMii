@@ -81,6 +81,9 @@
 		"valarray": "cpp",
 		"complex": "cpp",
 		"*.def": "cpp",
-		"csignal": "cpp"
+		"csignal": "cpp",
+		"strstream": "cpp",
+		"charconv": "cpp",
+		"*.inc": "cpp"
 	}
 }

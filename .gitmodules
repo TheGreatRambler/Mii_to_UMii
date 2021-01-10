@@ -1,0 +1,9 @@
+[submodule "lib/oead"]
+	path = lib/oead
+	url = https://github.com/zeldamods/oead
+[submodule "lib/ZXing"]
+	path = lib/ZXing
+	url = https://github.com/nu-book/zxing-cpp
+[submodule "lib/cryptopp"]
+	path = lib/cryptopp
+	url = https://github.com/weidai11/cryptopp

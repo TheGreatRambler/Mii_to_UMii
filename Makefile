@@ -26,10 +26,102 @@ CFLAGS := -std=c11
 CXXFLAGS := -std=gnu++17
 
 # C/C++ flags
-CPPFLAGS := -Wall -Wno-maybe-uninitialized -Wno-sign-compare -Wno-switch-enum -Wno-switch -Wno-deprecated-declarations -DKS_STR_ENCODING_NONE -DCPPGLOB_BUILDING $(shell pkg-config --cflags fmt libcurl yaml-0.1 zlib) -I./include -I./src/third_party
+CPPFLAGS := -Wall -Wno-maybe-uninitialized -Wno-sign-compare -Wno-switch-enum -Wno-switch -Wno-deprecated-declarations -DKS_STR_ENCODING_NONE -DCPPGLOB_BUILDING $(shell pkg-config --cflags fmt libcurl) -I./include -I./src/third_party -fdata-sections -ffunction-sections
 
 # Linker flags
-LDFLAGS := $(shell pkg-config --libs fmt libcurl yaml-0.1 zlib) -L./lib -lpthread
+LDFLAGS := $(shell pkg-config --libs fmt libcurl) -Wl,--gc-sections
+
+# All the dang libraries I need to include
+CPPFLAGS += -I./lib/cryptopp -I./lib/oead/src/include -I./lib/ZXing/core/src -I./lib/oead/lib/abseil -I./lib/oead/lib/EasyIterator/include -I./lib/oead/lib/libyaml/include -I./lib/oead/lib/nonstd -I./lib/oead/lib/ordered-map/include -I./lib/oead/lib/rapidyaml/src -I./lib/oead/lib/zlib-ng
+LDFLAGS += \
+	-L./lib/cryptopp \
+	-L./lib/oead/bin/lib/abseil/absl/base \
+	-L./lib/oead/bin/lib/abseil/absl/container \
+	-L./lib/oead/bin/lib/abseil/absl/debugging \
+	-L./lib/oead/bin/lib/abseil/absl/flags \
+	-L./lib/oead/bin/lib/abseil/absl/hash \
+	-L./lib/oead/bin/lib/abseil/absl/numeric \
+	-L./lib/oead/bin/lib/abseil/absl/random \
+	-L./lib/oead/bin/lib/abseil/absl/status \
+	-L./lib/oead/bin/lib/abseil/absl/strings \
+	-L./lib/oead/bin/lib/abseil/absl/synchronization \
+	-L./lib/oead/bin/lib/abseil/absl/time \
+	-L./lib/oead/bin/lib/abseil/absl/types \
+	-L./lib/oead/bin/lib/libyaml \
+	-L./lib/oead/bin/lib/rapidyaml \
+	-L./lib/oead/bin/lib/rapidyaml/subprojects/c4core/build \
+	-L./lib/oead/bin/lib/zlib-ng \
+	-L./lib/oead/bin \
+	-L./lib/ZXing/bin/core \
+	-loead \
+	-loead_res \
+	-labsl_hash \
+	-labsl_strings \
+	-labsl_strings_internal \
+	-labsl_str_format_internal \
+	-labsl_exponential_biased \
+	-labsl_log_severity \
+	-labsl_malloc_internal \
+	-labsl_periodic_sampler \
+	-labsl_raw_logging_internal \
+	-labsl_scoped_set_env \
+	-labsl_spinlock_wait \
+	-labsl_strerror \
+	-labsl_throw_delegate \
+	-labsl_hashtablez_sampler \
+	-labsl_raw_hash_set \
+	-labsl_debugging_internal \
+	-labsl_demangle_internal \
+	-labsl_examine_stack \
+	-labsl_failure_signal_handler \
+	-labsl_leak_check \
+	-labsl_leak_check_disable \
+	-labsl_stacktrace \
+	-labsl_symbolize \
+	-labsl_flags \
+	-labsl_flags_commandlineflag \
+	-labsl_flags_commandlineflag_internal \
+	-labsl_flags_config \
+	-labsl_flags_internal \
+	-labsl_flags_marshalling \
+	-labsl_flags_parse \
+	-labsl_flags_private_handle_accessor \
+	-labsl_flags_program_name \
+	-labsl_flags_reflection \
+	-labsl_flags_usage \
+	-labsl_flags_usage_internal \
+	-labsl_city \
+	-labsl_wyhash \
+	-labsl_int128 \
+	-labsl_random_distributions \
+	-labsl_random_internal_distribution_test_util \
+	-labsl_random_internal_platform \
+	-labsl_random_internal_pool_urbg \
+	-labsl_random_internal_randen \
+	-labsl_random_internal_randen_hwaes \
+	-labsl_random_internal_randen_hwaes_impl \
+	-labsl_random_internal_randen_slow \
+	-labsl_random_internal_seed_material \
+	-labsl_random_seed_gen_exception \
+	-labsl_random_seed_sequences \
+	-labsl_status \
+	-labsl_statusor \
+	-labsl_cord \
+	-labsl_graphcycles_internal \
+	-labsl_synchronization \
+	-labsl_civil_time \
+	-labsl_time \
+	-labsl_time_zone \
+	-labsl_bad_any_cast_impl \
+	-labsl_bad_optional_access \
+	-labsl_bad_variant_access \
+	-labsl_base \
+	-lyaml \
+	-lryml \
+	-lc4core \
+	-lzlib \
+	-lcryptopp \
+	-lZXing
 
 ifeq ($(UNAME),Msys)
 	# Needed for sockets on windows
@@ -44,19 +136,11 @@ else
 	CPPFLAGS += -Og -g -ggdb -DDEBUG
 endif
 
-ifeq ($(UNAME),Msys)
-	CPPFLAGS += -I./lib
-	LDFLAGS += -lZXing -lcryptopp;
-else
-	CPPFLAGS += $(shell pkg-config --cflags zxing libcrypto++)
-	LDFLAGS += $(shell pkg-config --libs zxing libcrypto++)
-endif
-
 ifeq ($(ARCH),32)
 	CPPFLAGS += -m32
 	LDFLAGS += -m32
 else
-	CXXFLAGS += 
+	#CXXFLAGS += 
 endif
 
 ifeq ($(UNAME),Msys)
