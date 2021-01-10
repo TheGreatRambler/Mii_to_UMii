@@ -5,6 +5,7 @@
 #include <codecvt>
 #include <cstdint>
 #include <cstdio>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <istream>

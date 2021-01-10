@@ -276,7 +276,7 @@ int main (int argc, char* argv[]) {
 		("v,version", "Print verson")
 		("p,mod-path", "Specify root folder of mod", cxxopts::value<std::string>())
 		("r,romfs", "Path to ROMFS dump", cxxopts::value<std::string>())
-		("d,delete-actor-folder", "Delete automatically generated actor folder")
+		("d,delete-actor-folder", "Delete automatically generated actor folder", cxxopts::value<bool>()->default_value("true"))
 		("h,help", "Print usage");
 	// clang-format on
 
@@ -315,7 +315,7 @@ int main (int argc, char* argv[]) {
 		if (curl) {
 			FILE* fp = fopen (filename.c_str (), "wb");
 			curl_easy_setopt (curl, CURLOPT_URL, inputFileString.c_str ());
-			curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, [](void* ptr, size_t size, size_t nmemb, FILE* stream) {
+			curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, [] (void* ptr, size_t size, size_t nmemb, FILE* stream) {
 				size_t written = fwrite (ptr, size, nmemb, stream);
 				return written;
 			});
@@ -348,7 +348,7 @@ int main (int argc, char* argv[]) {
 			// clang-format off
 			puts (fmt::format (
 				"| Input file {} does not exist, aborting",
-			inputPath.string()).c_str ());
+			inputPath.make_preferred().string()).c_str ());
 			// clang-format on
 			return 3;
 		}
@@ -370,7 +370,7 @@ int main (int argc, char* argv[]) {
 				puts (fmt::format (
 					"| Mod actor folder: {}\n"
 					"| Romfs actor folder: {}",
-				modActorPath, romfsActorPath).c_str ());
+				modActorPath.make_preferred().string(), romfsActorPath.make_preferred().string()).c_str ());
 				// clang-format on
 			}
 		} else {
@@ -390,7 +390,7 @@ int main (int argc, char* argv[]) {
 			// clang-format off
 			puts (fmt::format (
 				"    {}",
-			inputPath.string()).c_str ());
+			inputPath.make_preferred().string()).c_str ());
 			// clang-format on
 		}
 	}
@@ -411,26 +411,20 @@ int main (int argc, char* argv[]) {
 					// clang-format off
 					puts (fmt::format (
 						"| {} using sbactorpack file {}",
-					inputPath.string(), romfsPack.string()).c_str ());
+					inputPath.make_preferred().string(), romfsPack.make_preferred().string()).c_str ());
 					// clang-format on
 				}
 
 				std::vector<uint8_t> romfsPackBinary             = HELPERS::readFile (romfsPack.string ().c_str ());
 				std::vector<uint8_t> decompressedRomfsPackBinary = oead::yaz0::Decompress (romfsPackBinary);
-				auto filesInArchive                              = oead::Sarc (decompressedRomfsPackBinary).GetFiles ();
+				oead::Sarc sarc (decompressedRomfsPackBinary);
+				auto filesInArchive = sarc.GetFiles ();
 				for (oead::Sarc::File file : filesInArchive) {
 					std::filesystem::path pathHere (modActorPath);
 					pathHere.append (inputFileName);
 					pathHere.append (file.name);
 
-					if (isVerbose) {
-						// clang-format off
-						puts (fmt::format (
-							"| {} -> {}",
-						file.name, pathHere.string()).c_str ());
-						// clang-format on
-					}
-
+					std::filesystem::create_directories (std::filesystem::path (pathHere).parent_path ());
 					std::ofstream fileStream (pathHere, std::ofstream::binary);
 					fileStream.write ((char*)file.data.data (), file.data.size ());
 					fileStream.close ();
@@ -439,8 +433,9 @@ int main (int argc, char* argv[]) {
 				// clang-format off
 				puts (fmt::format (
 					"| ROMFS pack {} does not exist at {}, aborting",
-				inputFileName, romfsPack.string()).c_str ());
+				inputFileName, romfsPack.make_preferred().string()).c_str ());
 				// clang-format on
+				return 3;
 			}
 		}
 
@@ -454,7 +449,7 @@ int main (int argc, char* argv[]) {
 					// clang-format off
 					puts (fmt::format (
 						"| Type {} inferred from path {}",
-					inputType, inputPath.string()).c_str ());
+					inputType, inputPath.make_preferred().string()).c_str ());
 					// clang-format on
 				}
 			} catch (std::out_of_range& e) {
@@ -478,7 +473,7 @@ int main (int argc, char* argv[]) {
 				}
 			} else {
 				// Will be converted to binary regardless if mod
-				std::string withoutExtension = std::filesystem::path (inputPath).replace_extension ("").string ();
+				std::string withoutExtension = std::filesystem::path (inputPath).replace_extension ("").make_preferred ().string ();
 				outputFile                   = fmt::format ("{}{}", withoutExtension, outputAsBinary ? ".bumii" : ".umii.yml");
 			}
 		} else {
@@ -489,22 +484,22 @@ int main (int argc, char* argv[]) {
 			for (auto const& file : std::filesystem::directory_iterator (pathHere)) {
 				std::filesystem::path filePath = file.path ();
 				if (filePath.extension ().string () == ".bumii") {
-					outputFile = std::filesystem::absolute (filePath).string ();
+					outputFile = std::filesystem::absolute (filePath).make_preferred ().string ();
 					break;
 				}
-			}
-
-			if (isVerbose) {
-				// clang-format off
-				puts (fmt::format (
-					"| Chosen bumii file: {}",
-				outputFile).c_str ());
-				// clang-format on
 			}
 
 			if (outputFile.empty ()) {
 				puts ("| Chosen actor does not have any Miis, aborting");
 				return 3;
+			} else {
+				if (isVerbose) {
+					// clang-format off
+					puts (fmt::format (
+						"| Chosen bumii file: {}",
+					outputFile).c_str ());
+					// clang-format on
+				}
 			}
 		}
 
@@ -516,7 +511,7 @@ int main (int argc, char* argv[]) {
 				"| Input file: {}\n"
 				"| Input file size: {}\n"
 				"| Output file: {}",
-			programVersion, inputType, inputPath.string(), std::filesystem::file_size(inputPath), outputFile).c_str ());
+			programVersion, inputType, inputPath.make_preferred().string(), std::filesystem::file_size(inputPath), outputFile).c_str ());
 			// clang-format on
 		}
 
@@ -978,17 +973,10 @@ int main (int argc, char* argv[]) {
 			modActor.append (inputFileName);
 			for (const auto& entry : std::filesystem::recursive_directory_iterator (modActor)) {
 				std::filesystem::path relativePath = std::filesystem::relative (entry, modActor);
+				relativePath.make_preferred ();
 
 				if (!std::filesystem::is_directory (relativePath)) {
 					rootSarcWriter.m_files[relativePath.string ()] = HELPERS::readFile (entry.path ().string ().c_str ());
-
-					if (isVerbose) {
-						// clang-format off
-						puts (fmt::format (
-							"| {}: {}",
-						relativePath.string (), entry.path ().string ()).c_str ());
-						// clang-format on
-					}
 				}
 			}
 
@@ -996,7 +984,7 @@ int main (int argc, char* argv[]) {
 			outputSbactorpack.append (fmt::format ("{}.sbactorpack", inputFileName));
 
 			if (isVerbose) {
-				puts (fmt::format ().c_str ("| Writing actor file back to {}", outputSbactorpack.string ()));
+				puts (fmt::format ("| Writing actor file back to {}", outputSbactorpack.string ()).c_str ());
 			}
 
 			auto writtenData                           = rootSarcWriter.Write ();
@@ -1009,7 +997,7 @@ int main (int argc, char* argv[]) {
 			if (commandLineResult["delete-actor-folder"].as<bool> ()) {
 				std::filesystem::path folderToDelete = std::filesystem::path (modActorPath).append (inputFileName);
 				if (isVerbose) {
-					puts (fmt::format ().c_str ("| Deleting temporary actor folder {}", folderToDelete));
+					puts (fmt::format ("| Deleting temporary actor folder {}", folderToDelete.string ()).c_str ());
 				}
 				std::filesystem::remove_all (folderToDelete);
 			}

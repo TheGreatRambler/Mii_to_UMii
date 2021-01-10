@@ -52,7 +52,7 @@ LDFLAGS += \
 	-L./lib/oead/build/lib/rapidyaml/subprojects/c4core/build \
 	-L./lib/oead/build/lib/zlib-ng \
 	-L./lib/oead/build \
-	-L./lib/ZXing/bin/core \
+	-L./lib/ZXing_build/core \
 	-loead \
 	-loead_res \
 	-labsl_hash \

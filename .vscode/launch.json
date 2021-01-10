@@ -11,7 +11,11 @@
 			"program": "${workspaceFolder}/bin/miitoumii.exe",
 			"args": [
 				"-i",
-				"3DS_Test_Female.jpg",
+				"Npc_HatenoVillage.jpg",
+				"-r",
+				"C:/Users/aehar/Downloads/romfs",
+				"-p",
+				"C:/Users/aehar/Downloads/mod",
 				"-x"
 			],
 			"logging": {
