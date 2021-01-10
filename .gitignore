@@ -16,3 +16,4 @@ compile_commands.json
 *.cfsd
 *.png
 lib/ZXing_build
+*.deb
