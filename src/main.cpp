@@ -65,8 +65,8 @@ static const std::string programVersion = "0.0.1";
 std::string getStringifiedUmii (Mii::MiiInfo& info) {
 	// clang-format off
 	return fmt::format(
-		"!io\n"
-		"version: 0\n"
+		"version: 2\n"
+		"io_version: 0\n"
 		"type: xml\n"
 		"param_root: !list\n"
 		"  objects:\n"
@@ -85,8 +85,8 @@ std::string getStringifiedUmii (Mii::MiiInfo& info) {
 		"      head_fav_color: {}\n"
 		"      shoulder_fav_color: {}\n"
 		"      shoulder_sub_color_1: {}\n"
-		"      personality: {}\n"
-		"      voice_type: {}\n"
+		"      personality: !strRef {}\n"
+		"      voice_type: !strRef {}\n"
 		"    common: !obj\n"
 		"      backpack: {}\n"
 		"      hat: {}\n"
@@ -315,10 +315,11 @@ int main (int argc, char* argv[]) {
 		if (curl) {
 			FILE* fp = fopen (filename.c_str (), "wb");
 			curl_easy_setopt (curl, CURLOPT_URL, inputFileString.c_str ());
-			curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, +[](void* ptr, size_t size, size_t nmemb, FILE* stream) {
-				size_t written = fwrite (ptr, size, nmemb, stream);
-				return written;
-			});
+			curl_easy_setopt (
+				curl, CURLOPT_WRITEFUNCTION, +[] (void* ptr, size_t size, size_t nmemb, FILE* stream) {
+					size_t written = fwrite (ptr, size, nmemb, stream);
+					return written;
+				});
 			curl_easy_setopt (curl, CURLOPT_WRITEDATA, fp);
 			curl_easy_setopt (curl, CURLOPT_SSL_VERIFYPEER, 0L);
 			CURLcode res = curl_easy_perform (curl);

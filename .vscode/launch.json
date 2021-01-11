@@ -11,12 +11,9 @@
 			"program": "${workspaceFolder}/bin/miitoumii.exe",
 			"args": [
 				"-i",
-				"Npc_HatenoVillage.jpg",
-				"-r",
-				"C:/Users/aehar/Downloads/romfs",
-				"-p",
-				"C:/Users/aehar/Downloads/mod",
-				"-x"
+				"https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/794b41f3-df19-4dcf-8e17-aa1ea362d0ca/d8ox3vz-dc09f6b8-fe73-454a-987c-66cf2098f2ed.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvNzk0YjQxZjMtZGYxOS00ZGNmLThlMTctYWExZWEzNjJkMGNhXC9kOG94M3Z6LWRjMDlmNmI4LWZlNzMtNDU0YS05ODdjLTY2Y2YyMDk4ZjJlZC5qcGcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.gzsz7ZewPZuSPvW7mr7ZLrUr3cD2m172zzMTEDGHoMo",
+				"-x",
+				"-b"
 			],
 			"logging": {
 				"moduleLoad": true,
@@ -42,7 +39,10 @@
 			"request": "launch",
 			"program": "${workspaceFolder}/bin/miitoumii",
 			"args": [
-				"-i","https://www.miicharacters.com/miis/qr_thumb/1972_peterg.jpg","-b","-x"
+				"-i",
+				"https://www.miicharacters.com/miis/qr_thumb/1972_peterg.jpg",
+				"-b",
+				"-x"
 			],
 			"logging": {
 				"moduleLoad": true,

@@ -21,7 +21,7 @@ Usage:
   -h, --help                 Print usage
 ```
 
-* `input`: The input Mii to convert. Miis for Wii, Wii U, 3DS, Switch and Mii Studio are all supported, as well as Miis from [the online Mii editor here](https://rc24.xyz/goodies/mii/) and QR codes
+* `input`: The input Mii to convert. Miis for Wii, Wii U, 3DS, Switch and Mii Studio are all supported, as well as Miis from [the online Mii editor here](https://rc24.xyz/goodies/mii/) and QR codes. URLs are also supported, as well as file wildcards like `*.jpg` to convert all QR codes in a folder
 * `output`: The path to the output Mii
 * `type`: The type of the input Mii. Either you can leave this blank and have the program guess the type from the extension:
 ```

@@ -84,6 +84,7 @@
 		"csignal": "cpp",
 		"strstream": "cpp",
 		"charconv": "cpp",
-		"*.inc": "cpp"
+		"*.inc": "cpp",
+		"*.ipp": "cpp"
 	}
 }
