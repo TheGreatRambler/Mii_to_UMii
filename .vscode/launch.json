@@ -42,9 +42,7 @@
 			"request": "launch",
 			"program": "${workspaceFolder}/bin/miitoumii",
 			"args": [
-				"-i",
-				"3DS_Test_Female.jpg",
-				"-x"
+				"-i","https://www.miicharacters.com/miis/qr_thumb/1972_peterg.jpg","-b","-x"
 			],
 			"logging": {
 				"moduleLoad": true,

@@ -315,7 +315,7 @@ int main (int argc, char* argv[]) {
 		if (curl) {
 			FILE* fp = fopen (filename.c_str (), "wb");
 			curl_easy_setopt (curl, CURLOPT_URL, inputFileString.c_str ());
-			curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, [] (void* ptr, size_t size, size_t nmemb, FILE* stream) {
+			curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, +[](void* ptr, size_t size, size_t nmemb, FILE* stream) {
 				size_t written = fwrite (ptr, size, nmemb, stream);
 				return written;
 			});
