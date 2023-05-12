@@ -1,4 +1,4 @@
-# Mii_to_UMii
+# Mii to UMii
 A program to programmatically convert Miis to UMiis for BoTW/ToTK, both Switch and Wii U. This program can only be controlled from the command line. This can be accessed by running `cmd` on Windows in the folder where the program is downloaded, or by opening the terminal on other operating systems.
 
 ## Command Line Options
