@@ -29,7 +29,7 @@ CXXFLAGS := -std=gnu++17
 CPPFLAGS := -Wall -Wno-maybe-uninitialized -Wno-sign-compare -Wno-switch-enum -Wno-switch -Wno-deprecated-declarations -DKS_STR_ENCODING_NONE -DCPPGLOB_BUILDING $(shell pkg-config --cflags fmt libcurl) -I./include -I./src/third_party -fdata-sections -ffunction-sections
 
 # Linker flags
-LDFLAGS := $(shell pkg-config --libs fmt libcurl) -Wl,--gc-sections
+LDFLAGS := $(shell pkg-config --libs fmt libcurl)
 
 # All the dang libraries I need to include
 CPPFLAGS += -I./lib/cryptopp -I./lib/oead/src/include -I./lib/ZXing/core/src -I./lib/oead/lib/abseil -I./lib/oead/lib/EasyIterator/include -I./lib/oead/lib/libyaml/include -I./lib/oead/lib/nonstd -I./lib/oead/lib/ordered-map/include -I./lib/oead/lib/rapidyaml/src -I./lib/oead/lib/zlib-ng

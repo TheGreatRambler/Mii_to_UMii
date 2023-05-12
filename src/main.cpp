@@ -26,25 +26,25 @@ int _dowildcard = 0;
 #include <TextUtfEncoding.h>
 #include <aes.h>
 #include <ccm.h>
-#include <oead/aamp.h>
-#include <oead/yaz0.h>
-#include <oead/sarc.h>
-#include <filters.h>
-#include <unordered_map>
-#include <curl/curl.h>
 #include <cstdint>
-#include <glob.hpp>
 #include <cstdio>
 #include <cstdlib>
+#include <curl/curl.h>
 #include <cxxopts.hpp>
 #include <exception>
 #include <filesystem>
+#include <filters.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <fstream>
+#include <glob.hpp>
 #include <memory>
+#include <oead/aamp.h>
+#include <oead/sarc.h>
+#include <oead/yaz0.h>
 #include <stb_image.h>
 #include <string>
+#include <unordered_map>
 
 #include "ksy_gen/kaitai/exceptions.h"
 #include "ksy_gen/kaitai/kaitaistream.h"
@@ -264,7 +264,7 @@ std::string getStringifiedUmii (Mii::MiiInfo& info) {
 }
 
 int main (int argc, char* argv[]) {
-	cxxopts::Options commandLineOptions ("Mii_to_UMii", "Convert Mii files to UMii files for use with BoTW");
+	cxxopts::Options commandLineOptions ("Mii_to_UMii", "Convert Mii files to UMii files for use with BoTW/ToTK");
 
 	// clang-format off
 	commandLineOptions.add_options()
