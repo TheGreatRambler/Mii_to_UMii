@@ -57,4 +57,4 @@ I do not promote any of these methods and I am simply documenting them here to a
 	* Requires at the very least a save dump of Super Smash Bros. Ultimate (with a Mii Fighter of your Mii saved), Super Mario Maker 2 (with the Mii as your Maker Mii or with the Mii as the creator of a downloaded course/world record on a downloaded course), or Mario Kart 8 Deluxe (with the Mii holding a record in a Time Trial course). The Mii can be found within the save of each game
 * Mii Studio: https://github.com/RiiConnect24/mii2studio#exporting
 
-[MiiCharactors.com](https://www.miicharacters.com/) also houses a database of user uploaded Miis. You can download the qr code provided with each Mii and import the Mii that way. The watermark might make the Mii impossible to transfer, but most should work
+[MiiCharacters.com](https://www.miicharacters.com/) also houses a database of user uploaded Miis. You can download the qr code provided with each Mii and import the Mii that way. The watermark might make the Mii impossible to transfer, but most should work
